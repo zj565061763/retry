@@ -103,11 +103,11 @@ public abstract class FRetryHandler
     };
 
     /**
-     * 是否达到最大重试次数，如果达到会停止重试，并回调{@link #onRetryMaxCount()}方法
+     * 检查是否达到最大重试次数，如果达到的话会停止重试，并回调{@link #onRetryMaxCount()}方法
      *
      * @return true-达到最大次数
      */
-    protected final synchronized boolean checkMaxRetry()
+    private boolean checkMaxRetry()
     {
         if (mRetryCount >= mMaxRetryCount)
         {
