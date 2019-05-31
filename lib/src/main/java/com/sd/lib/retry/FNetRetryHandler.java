@@ -10,11 +10,11 @@ import android.net.NetworkInfo;
 /**
  * 需要用到网络的重试帮助类
  */
-public abstract class FNetRetryWorker extends FRetryWorker
+public abstract class FNetRetryHandler extends FRetryHandler
 {
     private NetworkReceiver mNetworkReceiver;
 
-    public FNetRetryWorker(Context context, int maxRetryCount)
+    public FNetRetryHandler(Context context, int maxRetryCount)
     {
         super(maxRetryCount);
         mNetworkReceiver = new NetworkReceiver(context);

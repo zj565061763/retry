@@ -6,7 +6,7 @@ import android.os.Looper;
 /**
  * 重试帮助类
  */
-public abstract class FRetryWorker
+public abstract class FRetryHandler
 {
     /**
      * 最大重试次数
@@ -24,7 +24,7 @@ public abstract class FRetryWorker
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    public FRetryWorker(int maxRetryCount)
+    public FRetryHandler(int maxRetryCount)
     {
         if (maxRetryCount <= 0)
             throw new IllegalArgumentException("maxRetryCount must > 0");
@@ -87,7 +87,7 @@ public abstract class FRetryWorker
         @Override
         public void run()
         {
-            synchronized (FRetryWorker.this)
+            synchronized (FRetryHandler.this)
             {
                 if (!mIsStarted)
                     return;
