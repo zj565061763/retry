@@ -55,7 +55,7 @@ public abstract class FNetRetryHandler extends FRetryHandler
     }
 
     /**
-     * 执行重试任务（UI线程）
+     * 网络可用，执行重试任务（UI线程）
      */
     protected abstract void onRetryImpl();
 
