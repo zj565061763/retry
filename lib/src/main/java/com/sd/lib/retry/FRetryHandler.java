@@ -69,17 +69,19 @@ public abstract class FRetryHandler
      * 重试，只有{@link #isStarted()}为true，此方法才有效
      *
      * @param delayMillis 延迟多少毫秒
+     * @return true-成功发起了一次重试
      */
-    protected final synchronized void retry(long delayMillis)
+    public final synchronized boolean retry(long delayMillis)
     {
         if (!mIsStarted)
-            return;
+            return false;
 
         if (checkMaxRetry())
-            return;
+            return false;
 
         mHandler.removeCallbacks(mRetryRunnable);
         mHandler.postDelayed(mRetryRunnable, delayMillis);
+        return true;
     }
 
     private final Runnable mRetryRunnable = new Runnable()
