@@ -12,20 +12,48 @@ import android.net.NetworkInfo;
  */
 public abstract class FNetRetryHandler extends FRetryHandler
 {
+    private final Context mContext;
     private NetworkReceiver mNetworkReceiver;
 
     public FNetRetryHandler(Context context, int maxRetryCount)
     {
         super(maxRetryCount);
-        mNetworkReceiver = new NetworkReceiver(context);
-        mNetworkReceiver.register();
+        mContext = context.getApplicationContext();
+    }
+
+    @Override
+    protected void onStateChanged(boolean started)
+    {
+        super.onStateChanged(started);
+        if (started)
+        {
+            registerReceiver(true);
+        } else
+        {
+            registerReceiver(false);
+        }
+    }
+
+    private void registerReceiver(boolean register)
+    {
+        if (mNetworkReceiver != null)
+        {
+            mNetworkReceiver.unregister();
+            mNetworkReceiver = null;
+        }
+
+        if (register)
+        {
+            mNetworkReceiver = new NetworkReceiver(mContext);
+            mNetworkReceiver.register();
+        }
     }
 
     @Override
     protected final void onRetry()
     {
         if (mNetworkReceiver == null)
-            throw new RuntimeException("current instance has been destroyed");
+            throw new RuntimeException("NetworkReceiver instance is null");
 
         final NetworkInfo networkInfo = mNetworkReceiver.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected())
@@ -36,6 +64,11 @@ public abstract class FNetRetryHandler extends FRetryHandler
             onRetryWhenNetworkDisconnected();
         }
     }
+
+    /**
+     * 网络可用，执行重试任务（UI线程）
+     */
+    protected abstract void onRetryImpl();
 
     /**
      * 重试的时候网络不可用回调
@@ -52,24 +85,6 @@ public abstract class FNetRetryHandler extends FRetryHandler
     protected void onNetworkConnected(NetworkInfo networkInfo)
     {
         retry(0);
-    }
-
-    /**
-     * 网络可用，执行重试任务（UI线程）
-     */
-    protected abstract void onRetryImpl();
-
-    /**
-     * 销毁
-     */
-    public final synchronized void destroy()
-    {
-        stop();
-        if (mNetworkReceiver != null)
-        {
-            mNetworkReceiver.unregister();
-            mNetworkReceiver = null;
-        }
     }
 
     private final class NetworkReceiver extends BroadcastReceiver
