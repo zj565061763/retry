@@ -105,7 +105,7 @@ public abstract class FRetryHandler
      *
      * @return true-达到最大次数
      */
-    protected final boolean checkMaxRetry()
+    private boolean checkMaxRetry()
     {
         if (mRetryCount >= mMaxRetryCount)
         {
