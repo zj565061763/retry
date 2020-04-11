@@ -242,11 +242,11 @@ public abstract class FRetryHandler
         @Override
         public void onLoading()
         {
+            if (nIsFinish)
+                return;
+
             synchronized (FRetryHandler.this)
             {
-                if (nIsFinish)
-                    return;
-
                 if (mIsStarted)
                     mIsLoading = true;
             }
@@ -255,25 +255,22 @@ public abstract class FRetryHandler
         @Override
         public void onLoadSuccess()
         {
-            synchronized (FRetryHandler.this)
-            {
-                if (nIsFinish)
-                    return;
+            if (nIsFinish)
+                return;
+            nIsFinish = true;
 
-                nIsFinish = true;
-                cancelInternal(false);
-            }
+            cancelInternal(false);
         }
 
         @Override
         public void onLoadError()
         {
+            if (nIsFinish)
+                return;
+            nIsFinish = true;
+
             synchronized (FRetryHandler.this)
             {
-                if (nIsFinish)
-                    return;
-
-                nIsFinish = true;
                 mIsLoading = false;
                 retry(mRetryInterval);
             }
