@@ -149,7 +149,7 @@ public abstract class FRetryHandler
         if (mRetryCount >= mMaxRetryCount)
         {
             // 达到最大重试次数
-            stop();
+            cancel();
             onRetryMaxCount();
             return true;
         }
@@ -159,7 +159,7 @@ public abstract class FRetryHandler
     /**
      * 停止重试
      */
-    public final synchronized void stop()
+    public final synchronized void cancel()
     {
         if (mIsStarted)
         {
@@ -190,7 +190,7 @@ public abstract class FRetryHandler
     }
 
     /**
-     * 调用{@link #stop()}的时候如果发现正在加载中，则会触发此方法取消加载
+     * 调用{@link #cancel()}的时候如果发现正在加载中，则会触发此方法取消加载
      */
     protected void cancelLoading()
     {
