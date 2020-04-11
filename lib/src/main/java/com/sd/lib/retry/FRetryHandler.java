@@ -16,11 +16,15 @@ public abstract class FRetryHandler
     /**
      * 重试是否已经开始
      */
-    private boolean mIsStarted;
+    private volatile boolean mIsStarted;
     /**
      * 当前第几次重试
      */
-    private int mRetryCount;
+    private volatile int mRetryCount;
+    /**
+     * 某一次重试是否正在加载中
+     */
+    private volatile boolean mIsLoading;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -52,6 +56,27 @@ public abstract class FRetryHandler
     }
 
     /**
+     * 某一次重试是否正在加载中
+     *
+     * @return
+     */
+    public final boolean isLoading()
+    {
+        return mIsLoading;
+    }
+
+    /**
+     * 设置某一次重试是否正在加载中
+     *
+     * @param loading
+     */
+    public synchronized void setLoading(boolean loading)
+    {
+        if (mIsStarted)
+            mIsLoading = loading;
+    }
+
+    /**
      * 开始重试
      */
     public final synchronized void start()
@@ -59,9 +84,7 @@ public abstract class FRetryHandler
         if (mIsStarted)
             return;
 
-        mRetryCount = 0;
         setStarted(true);
-
         retry(0);
     }
 
@@ -123,7 +146,6 @@ public abstract class FRetryHandler
     public final synchronized void stop()
     {
         mHandler.removeCallbacks(mRetryRunnable);
-        mRetryCount = 0;
         setStarted(false);
     }
 
@@ -131,6 +153,9 @@ public abstract class FRetryHandler
     {
         if (mIsStarted != started)
         {
+            mRetryCount = 0;
+            mIsLoading = false;
+
             mIsStarted = started;
             onStateChanged(started);
         }
