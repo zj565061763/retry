@@ -163,7 +163,7 @@ public abstract class FRetryHandler
         if (mRetryCount >= mMaxRetryCount)
         {
             // 达到最大重试次数
-            cancel();
+            cancelInternal(false);
             onRetryMaxCount();
             return true;
         }
