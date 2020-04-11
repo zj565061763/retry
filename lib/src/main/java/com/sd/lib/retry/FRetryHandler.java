@@ -190,16 +190,16 @@ public abstract class FRetryHandler
     }
 
     /**
-     * 执行重试任务（UI线程）
-     */
-    protected abstract void onRetry();
-
-    /**
      * 调用{@link #stop()}的时候如果发现正在加载中，则会触发此方法取消加载
      */
     protected void cancelLoading()
     {
     }
+
+    /**
+     * 执行重试任务（UI线程）
+     */
+    protected abstract void onRetry();
 
     /**
      * 达到最大重试次数
