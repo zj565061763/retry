@@ -27,25 +27,28 @@ public abstract class FNetRetryHandler extends FRetryHandler
         super.onStateChanged(started);
         if (started)
         {
-            registerReceiver(true);
+            registerReceiver();
         } else
         {
-            registerReceiver(false);
+            unregisterReceiver();
         }
     }
 
-    private void registerReceiver(boolean register)
+    private void registerReceiver()
+    {
+        if (mNetworkReceiver == null)
+        {
+            mNetworkReceiver = new NetworkReceiver(mContext);
+            mNetworkReceiver.register();
+        }
+    }
+
+    private void unregisterReceiver()
     {
         if (mNetworkReceiver != null)
         {
             mNetworkReceiver.unregister();
             mNetworkReceiver = null;
-        }
-
-        if (register)
-        {
-            mNetworkReceiver = new NetworkReceiver(mContext);
-            mNetworkReceiver.register();
         }
     }
 
