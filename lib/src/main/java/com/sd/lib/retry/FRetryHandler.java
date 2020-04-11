@@ -99,7 +99,7 @@ public abstract class FRetryHandler
      * @param delayMillis 延迟多少毫秒
      * @return true-成功发起了一次重试
      */
-    public final synchronized boolean retry(long delayMillis)
+    final synchronized boolean retry(long delayMillis)
     {
         if (!mIsStarted)
             return false;
