@@ -102,6 +102,9 @@ public abstract class FRetryHandler
         if (checkMaxRetry())
             return false;
 
+        if (mIsLoading)
+            throw new RuntimeException("can not retry while loading");
+
         mHandler.removeCallbacks(mRetryRunnable);
         mHandler.postDelayed(mRetryRunnable, delayMillis);
         return true;
