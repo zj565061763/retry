@@ -99,14 +99,27 @@ public abstract class FRetryHandler
         if (!mIsStarted)
             return false;
 
-        if (checkMaxRetry())
+        if (checkIsMaxRetry())
             return false;
 
         if (mIsLoading)
             throw new RuntimeException("can not retry while loading");
 
+        if (!checkRetry())
+            return false;
+
         mHandler.removeCallbacks(mRetryRunnable);
         mHandler.postDelayed(mRetryRunnable, delayMillis);
+        return true;
+    }
+
+    /**
+     * 检查是否可以发起重试
+     *
+     * @return
+     */
+    protected boolean checkRetry()
+    {
         return true;
     }
 
@@ -131,7 +144,7 @@ public abstract class FRetryHandler
      *
      * @return true-达到最大次数
      */
-    private boolean checkMaxRetry()
+    private boolean checkIsMaxRetry()
     {
         if (mRetryCount >= mMaxRetryCount)
         {
