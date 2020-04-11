@@ -139,36 +139,7 @@ public abstract class FRetryHandler
                     return;
 
                 mRetryCount++;
-                onRetry(mLoadCallback);
-            }
-        }
-    };
-
-    private final LoadCallback mLoadCallback = new LoadCallback()
-    {
-        @Override
-        public void onLoading()
-        {
-            synchronized (FRetryHandler.this)
-            {
-                if (mIsStarted)
-                    mIsLoading = true;
-            }
-        }
-
-        @Override
-        public void onLoadSuccess()
-        {
-            cancelInternal(false);
-        }
-
-        @Override
-        public void onLoadError()
-        {
-            synchronized (FRetryHandler.this)
-            {
-                mIsLoading = false;
-                retry(mRetryInterval);
+                onRetry(new InternalLoadCallback());
             }
         }
     };
@@ -247,6 +218,51 @@ public abstract class FRetryHandler
      */
     protected void onRetryMaxCount()
     {
+    }
+
+    private final class InternalLoadCallback implements LoadCallback
+    {
+        private volatile boolean nIsFinish;
+
+        @Override
+        public void onLoading()
+        {
+            if (nIsFinish)
+                return;
+
+            synchronized (FRetryHandler.this)
+            {
+                if (mIsStarted)
+                    mIsLoading = true;
+            }
+        }
+
+        @Override
+        public void onLoadSuccess()
+        {
+            if (nIsFinish)
+                return;
+
+            synchronized (FRetryHandler.this)
+            {
+                nIsFinish = true;
+                cancelInternal(false);
+            }
+        }
+
+        @Override
+        public void onLoadError()
+        {
+            if (nIsFinish)
+                return;
+
+            synchronized (FRetryHandler.this)
+            {
+                nIsFinish = true;
+                mIsLoading = false;
+                retry(mRetryInterval);
+            }
+        }
     }
 
     public interface LoadCallback
