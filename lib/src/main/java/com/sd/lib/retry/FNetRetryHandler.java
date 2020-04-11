@@ -84,7 +84,8 @@ public abstract class FNetRetryHandler extends FRetryHandler
      */
     protected void onNetworkConnected(NetworkInfo networkInfo)
     {
-        retry(0);
+        if (!isLoading())
+            retry(0);
     }
 
     private final class NetworkReceiver extends BroadcastReceiver
