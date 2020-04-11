@@ -128,6 +128,8 @@ public abstract class FRetryHandler
         return true;
     }
 
+    private InternalLoadCallback mLoadCallback;
+
     private final Runnable mRetryRunnable = new Runnable()
     {
         @Override
@@ -138,8 +140,15 @@ public abstract class FRetryHandler
                 if (!mIsStarted)
                     return;
 
+                if (mLoadCallback != null)
+                {
+                    if (!mLoadCallback.nIsFinish)
+                        throw new RuntimeException("last load callback is not finished");
+                }
+
                 mRetryCount++;
-                onRetry(new InternalLoadCallback());
+                mLoadCallback = new InternalLoadCallback();
+                onRetry(mLoadCallback);
             }
         }
     };
@@ -164,7 +173,7 @@ public abstract class FRetryHandler
     /**
      * 停止重试
      */
-    public final synchronized void cancel()
+    public final void cancel()
     {
         cancelInternal(true);
     }
@@ -174,6 +183,12 @@ public abstract class FRetryHandler
         if (mIsStarted)
         {
             mHandler.removeCallbacks(mRetryRunnable);
+
+            if (mLoadCallback != null)
+            {
+                mLoadCallback.nIsFinish = true;
+                mLoadCallback = null;
+            }
 
             final boolean isLoading = mIsLoading;
             setStarted(false);
@@ -227,11 +242,11 @@ public abstract class FRetryHandler
         @Override
         public void onLoading()
         {
-            if (nIsFinish)
-                return;
-
             synchronized (FRetryHandler.this)
             {
+                if (nIsFinish)
+                    return;
+
                 if (mIsStarted)
                     mIsLoading = true;
             }
@@ -240,11 +255,11 @@ public abstract class FRetryHandler
         @Override
         public void onLoadSuccess()
         {
-            if (nIsFinish)
-                return;
-
             synchronized (FRetryHandler.this)
             {
+                if (nIsFinish)
+                    return;
+
                 nIsFinish = true;
                 cancelInternal(false);
             }
@@ -253,11 +268,11 @@ public abstract class FRetryHandler
         @Override
         public void onLoadError()
         {
-            if (nIsFinish)
-                return;
-
             synchronized (FRetryHandler.this)
             {
+                if (nIsFinish)
+                    return;
+
                 nIsFinish = true;
                 mIsLoading = false;
                 retry(mRetryInterval);
