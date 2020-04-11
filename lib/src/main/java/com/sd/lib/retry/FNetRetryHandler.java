@@ -53,32 +53,31 @@ public abstract class FNetRetryHandler extends FRetryHandler
     }
 
     @Override
-    protected final void onRetry()
+    protected boolean checkRetry()
     {
         if (mNetworkReceiver == null)
             throw new RuntimeException("NetworkReceiver instance is null");
 
         final NetworkInfo networkInfo = mNetworkReceiver.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-        {
-            onRetryImpl();
-        } else
-        {
-            onRetryWhenNetworkDisconnected();
-        }
+        if (networkInfo == null)
+            return false;
+
+        if (!networkInfo.isConnected())
+            return false;
+
+        return super.checkRetry();
+    }
+
+    @Override
+    protected final void onRetry()
+    {
+        onRetryImpl();
     }
 
     /**
      * 网络可用，执行重试任务（UI线程）
      */
     protected abstract void onRetryImpl();
-
-    /**
-     * 重试的时候网络不可用回调
-     */
-    protected void onRetryWhenNetworkDisconnected()
-    {
-    }
 
     /**
      * 网络可用回调
