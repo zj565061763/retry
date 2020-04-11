@@ -68,17 +68,6 @@ public abstract class FNetRetryHandler extends FRetryHandler
         return super.checkRetry();
     }
 
-    @Override
-    protected final void onRetry()
-    {
-        onRetryImpl();
-    }
-
-    /**
-     * 网络可用，执行重试任务（UI线程）
-     */
-    protected abstract void onRetryImpl();
-
     /**
      * 网络可用回调
      *
@@ -86,8 +75,11 @@ public abstract class FNetRetryHandler extends FRetryHandler
      */
     protected void onNetworkConnected(NetworkInfo networkInfo)
     {
-        if (!isLoading())
-            retry(0);
+        synchronized (FNetRetryHandler.this)
+        {
+            if (!isLoading())
+                retry(0);
+        }
     }
 
     private final class NetworkReceiver extends BroadcastReceiver

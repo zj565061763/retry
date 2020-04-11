@@ -25,6 +25,10 @@ public abstract class FRetryHandler
      * 某一次重试是否正在加载中
      */
     private volatile boolean mIsLoading;
+    /**
+     * 重试间隔
+     */
+    private long mRetryInterval = 3 * 1000;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -66,14 +70,15 @@ public abstract class FRetryHandler
     }
 
     /**
-     * 设置某一次重试是否正在加载中
+     * 设置重试间隔，默认3000毫秒
      *
-     * @param loading
+     * @param retryInterval
      */
-    public final synchronized void setLoading(boolean loading)
+    public synchronized void setRetryInterval(long retryInterval)
     {
-        if (mIsStarted)
-            mIsLoading = loading;
+        if (retryInterval < 0)
+            retryInterval = 0;
+        mRetryInterval = retryInterval;
     }
 
     /**
@@ -134,7 +139,36 @@ public abstract class FRetryHandler
                     return;
 
                 mRetryCount++;
-                onRetry();
+                onRetry(mLoadCallback);
+            }
+        }
+    };
+
+    private final LoadCallback mLoadCallback = new LoadCallback()
+    {
+        @Override
+        public void onLoading()
+        {
+            synchronized (FRetryHandler.this)
+            {
+                if (mIsStarted)
+                    mIsLoading = true;
+            }
+        }
+
+        @Override
+        public void onLoadSuccess()
+        {
+            cancelInternal(false);
+        }
+
+        @Override
+        public void onLoadError()
+        {
+            synchronized (FRetryHandler.this)
+            {
+                mIsLoading = false;
+                retry(mRetryInterval);
             }
         }
     };
@@ -161,6 +195,11 @@ public abstract class FRetryHandler
      */
     public final synchronized void cancel()
     {
+        cancelInternal(true);
+    }
+
+    private synchronized void cancelInternal(boolean cancelLoading)
+    {
         if (mIsStarted)
         {
             mHandler.removeCallbacks(mRetryRunnable);
@@ -168,7 +207,7 @@ public abstract class FRetryHandler
             final boolean isLoading = mIsLoading;
             setStarted(false);
 
-            if (isLoading)
+            if (isLoading && cancelLoading)
                 cancelLoading();
         }
     }
@@ -198,13 +237,24 @@ public abstract class FRetryHandler
 
     /**
      * 执行重试任务（UI线程）
+     *
+     * @param callback
      */
-    protected abstract void onRetry();
+    protected abstract void onRetry(LoadCallback callback);
 
     /**
      * 达到最大重试次数
      */
     protected void onRetryMaxCount()
     {
+    }
+
+    public interface LoadCallback
+    {
+        void onLoading();
+
+        void onLoadSuccess();
+
+        void onLoadError();
     }
 }
