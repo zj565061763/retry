@@ -178,7 +178,7 @@ public abstract class FRetryHandler
         cancelInternal(true);
     }
 
-    private synchronized void cancelInternal(boolean cancelLoading)
+    private synchronized void cancelInternal(boolean cancelSession)
     {
         if (mIsStarted)
         {
@@ -193,8 +193,8 @@ public abstract class FRetryHandler
             final boolean isLoading = mIsLoading;
             setStarted(false);
 
-            if (isLoading && cancelLoading)
-                cancelLoading();
+            if (isLoading && cancelSession)
+                cancelLoadSession();
         }
     }
 
@@ -217,7 +217,7 @@ public abstract class FRetryHandler
     /**
      * 调用{@link #cancel()}的时候如果发现正在加载中，则会触发此方法取消加载
      */
-    protected void cancelLoading()
+    protected void cancelLoadSession()
     {
     }
 
