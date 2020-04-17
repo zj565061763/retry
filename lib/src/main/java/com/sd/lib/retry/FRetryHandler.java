@@ -128,7 +128,7 @@ public abstract class FRetryHandler
         return true;
     }
 
-    private InternalLoadCallback mLoadCallback;
+    private InternalLoadSession mLoadSession;
 
     private final Runnable mRetryRunnable = new Runnable()
     {
@@ -140,15 +140,15 @@ public abstract class FRetryHandler
                 if (!mIsStarted)
                     return;
 
-                if (mLoadCallback != null)
+                if (mLoadSession != null)
                 {
-                    if (!mLoadCallback.nIsFinish)
-                        throw new RuntimeException("last load callback is not finished");
+                    if (!mLoadSession.nIsFinish)
+                        throw new RuntimeException("last load session is not finished");
                 }
 
                 mRetryCount++;
-                mLoadCallback = new InternalLoadCallback();
-                onRetry(mLoadCallback);
+                mLoadSession = new InternalLoadSession();
+                onRetry(mLoadSession);
             }
         }
     };
@@ -184,10 +184,10 @@ public abstract class FRetryHandler
         {
             mHandler.removeCallbacks(mRetryRunnable);
 
-            if (mLoadCallback != null)
+            if (mLoadSession != null)
             {
-                mLoadCallback.nIsFinish = true;
-                mLoadCallback = null;
+                mLoadSession.nIsFinish = true;
+                mLoadSession = null;
             }
 
             final boolean isLoading = mIsLoading;
@@ -224,9 +224,9 @@ public abstract class FRetryHandler
     /**
      * 执行重试任务（UI线程）
      *
-     * @param callback
+     * @param session
      */
-    protected abstract void onRetry(LoadCallback callback);
+    protected abstract void onRetry(LoadSession session);
 
     /**
      * 达到最大重试次数
@@ -235,7 +235,7 @@ public abstract class FRetryHandler
     {
     }
 
-    private final class InternalLoadCallback implements LoadCallback
+    private final class InternalLoadSession implements LoadSession
     {
         private volatile boolean nIsFinish;
 
@@ -277,7 +277,7 @@ public abstract class FRetryHandler
         }
     }
 
-    public interface LoadCallback
+    public interface LoadSession
     {
         void onLoading();
 
