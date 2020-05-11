@@ -253,7 +253,7 @@ public abstract class FRetryHandler
         }
 
         @Override
-        public void onLoadSuccess()
+        public void onLoadFinish()
         {
             if (nIsFinish)
                 return;
@@ -281,7 +281,7 @@ public abstract class FRetryHandler
     {
         void onLoading();
 
-        void onLoadSuccess();
+        void onLoadFinish();
 
         void onLoadError();
     }
