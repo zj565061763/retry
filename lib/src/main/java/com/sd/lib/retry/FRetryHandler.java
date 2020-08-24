@@ -110,6 +110,12 @@ public abstract class FRetryHandler
         if (mIsLoading)
             throw new RuntimeException("can not retry while loading");
 
+        if (mLoadSession != null)
+        {
+            if (!mLoadSession.nIsFinish)
+                throw new RuntimeException("last load session is not finished");
+        }
+
         if (!checkRetry())
             return false;
 
@@ -137,18 +143,12 @@ public abstract class FRetryHandler
         {
             synchronized (FRetryHandler.this)
             {
-                if (!mIsStarted)
-                    return;
-
-                if (mLoadSession != null)
+                if (mIsStarted)
                 {
-                    if (!mLoadSession.nIsFinish)
-                        throw new RuntimeException("last load session is not finished");
+                    mRetryCount++;
+                    mLoadSession = new InternalLoadSession();
+                    onRetry(mLoadSession);
                 }
-
-                mRetryCount++;
-                mLoadSession = new InternalLoadSession();
-                onRetry(mLoadSession);
             }
         }
     };
