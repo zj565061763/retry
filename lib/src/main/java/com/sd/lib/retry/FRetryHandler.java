@@ -77,16 +77,16 @@ public abstract class FRetryHandler {
      *
      * @param delayMillis 延迟多少毫秒
      */
-    final synchronized boolean retry(long delayMillis) {
+    final synchronized void retry(long delayMillis) {
         if (!mIsStarted) {
-            return false;
+            return;
         }
 
         if (mRetryCount >= mMaxRetryCount) {
             // 达到最大重试次数
             cancelInternal(false);
             onRetryMaxCount();
-            return false;
+            return;
         }
 
         if (mIsLoading) {
@@ -99,13 +99,10 @@ public abstract class FRetryHandler {
             }
         }
 
-        if (!checkRetry()) {
-            return false;
+        if (checkRetry()) {
+            mHandler.removeCallbacks(mRetryRunnable);
+            mHandler.postDelayed(mRetryRunnable, delayMillis);
         }
-
-        mHandler.removeCallbacks(mRetryRunnable);
-        mHandler.postDelayed(mRetryRunnable, delayMillis);
-        return true;
     }
 
 
