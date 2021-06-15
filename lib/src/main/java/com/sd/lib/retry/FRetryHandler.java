@@ -7,26 +7,15 @@ import android.os.Looper;
  * 重试帮助类
  */
 public abstract class FRetryHandler {
-    /**
-     * 最大重试次数
-     */
+    /** 最大重试次数 */
     private final int mMaxRetryCount;
-
-    /**
-     * 重试是否已经开始
-     */
+    /** 重试是否已经开始 */
     private volatile boolean mIsStarted;
-    /**
-     * 当前第几次重试
-     */
+    /** 当前第几次重试 */
     private volatile int mRetryCount;
-    /**
-     * 某一次重试是否正在加载中
-     */
+    /** 某一次重试是否正在加载中 */
     private volatile boolean mIsLoading;
-    /**
-     * 重试间隔
-     */
+    /** 重试间隔 */
     private long mRetryInterval = 3 * 1000;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
@@ -40,8 +29,6 @@ public abstract class FRetryHandler {
 
     /**
      * 是否已经开始重试
-     *
-     * @return
      */
     public final boolean isStarted() {
         return mIsStarted;
@@ -49,8 +36,6 @@ public abstract class FRetryHandler {
 
     /**
      * 返回当前第几次重试
-     *
-     * @return
      */
     public final int getRetryCount() {
         return mRetryCount;
@@ -58,8 +43,6 @@ public abstract class FRetryHandler {
 
     /**
      * 某一次重试是否正在加载中
-     *
-     * @return
      */
     public final boolean isLoading() {
         return mIsLoading;
@@ -67,8 +50,6 @@ public abstract class FRetryHandler {
 
     /**
      * 设置重试间隔，默认3000毫秒
-     *
-     * @param retryInterval
      */
     public synchronized void setRetryInterval(long retryInterval) {
         if (retryInterval < 0) {
