@@ -16,14 +16,13 @@ class MyRetryHandler : FNetRetryHandler {
 
     override fun onRetry(session: LoadSession) {
         session.onLoading()
-        GlobalScope.launch {
-            _count++
-            Log.i(TAG, "onRetry count:${_count}")
-            if (_count >= 10) {
-                session.onLoadFinish()
-            } else {
-                session.onLoadError()
-            }
+        _count++
+        Log.i(TAG, "onRetry count:${_count}")
+
+        if (_count >= 10) {
+            session.onLoadFinish()
+        } else {
+            session.onLoadError()
         }
     }
 
