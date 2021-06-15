@@ -1,4 +1,4 @@
-package com.sd.lib.retry.demo
+package com.sd.demo.retry
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

@@ -6,7 +6,7 @@ plugins {
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "com.sd.lib.retry.demo"
+        applicationId "com.sd.demo.retry"
         minSdkVersion 15
         targetSdkVersion 30
         versionCode 1
