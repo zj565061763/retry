@@ -54,12 +54,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
             throw new RuntimeException("NetworkReceiver instance is null");
         }
 
-        final NetworkInfo networkInfo = mNetworkReceiver.getActiveNetworkInfo();
-        if (networkInfo == null) {
-            return false;
-        }
-
-        if (!networkInfo.isConnected()) {
+        if (!mNetworkReceiver.isConnected()) {
             return false;
         }
 
@@ -68,10 +63,8 @@ public abstract class FNetRetryHandler extends FRetryHandler {
 
     /**
      * 网络可用回调
-     *
-     * @param networkInfo
      */
-    protected void onNetworkConnected(NetworkInfo networkInfo) {
+    protected void onNetworkConnected() {
         synchronized (FNetRetryHandler.this) {
             final boolean isLoading = isLoading();
             Log.i(getClass().getSimpleName(), "onNetworkConnected isLoading:" + isLoading);
@@ -83,24 +76,30 @@ public abstract class FNetRetryHandler extends FRetryHandler {
 
     private final class NetworkReceiver extends BroadcastReceiver {
         private final Context mContext;
+        private boolean mIsNetworkConnected;
 
         public NetworkReceiver(Context context) {
             mContext = context.getApplicationContext();
+            mIsNetworkConnected = isConnected();
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                final NetworkInfo networkInfo = getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected()) {
-                    onNetworkConnected(networkInfo);
+                final boolean isConnected = isConnected();
+                if (mIsNetworkConnected != isConnected) {
+                    mIsNetworkConnected = isConnected;
+                    if (isConnected) {
+                        onNetworkConnected();
+                    }
                 }
             }
         }
 
-        public NetworkInfo getActiveNetworkInfo() {
+        public boolean isConnected() {
             final ConnectivityManager manager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            return manager.getActiveNetworkInfo();
+            final NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            return networkInfo != null && networkInfo.isConnected();
         }
 
         public void register() {
