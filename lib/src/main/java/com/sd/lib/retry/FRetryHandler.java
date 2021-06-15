@@ -83,7 +83,10 @@ public abstract class FRetryHandler {
             return false;
         }
 
-        if (checkIsMaxRetry()) {
+        if (mRetryCount >= mMaxRetryCount) {
+            // 达到最大重试次数
+            cancelInternal(false);
+            onRetryMaxCount();
             return false;
         }
 
@@ -129,21 +132,6 @@ public abstract class FRetryHandler {
             }
         }
     };
-
-    /**
-     * 检查是否达到最大重试次数，如果达到的话会停止重试，并回调{@link #onRetryMaxCount()}方法
-     *
-     * @return true-达到最大次数
-     */
-    private boolean checkIsMaxRetry() {
-        if (mRetryCount >= mMaxRetryCount) {
-            // 达到最大重试次数
-            cancelInternal(false);
-            onRetryMaxCount();
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 停止重试
