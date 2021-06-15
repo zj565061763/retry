@@ -151,20 +151,22 @@ public abstract class FRetryHandler {
     }
 
     private synchronized void cancelInternal(boolean cancelSession) {
-        if (mIsStarted) {
-            mHandler.removeCallbacks(mRetryRunnable);
+        if (!mIsStarted) {
+            return;
+        }
 
-            if (mLoadSession != null) {
-                mLoadSession.nIsFinish = true;
-                mLoadSession = null;
-            }
+        mHandler.removeCallbacks(mRetryRunnable);
 
-            final boolean isLoading = mIsLoading;
-            setStarted(false);
+        if (mLoadSession != null) {
+            mLoadSession.nIsFinish = true;
+            mLoadSession = null;
+        }
 
-            if (isLoading && cancelSession) {
-                cancelLoadSession();
-            }
+        final boolean isLoading = mIsLoading;
+        setStarted(false);
+
+        if (isLoading && cancelSession) {
+            cancelLoadSession();
         }
     }
 
