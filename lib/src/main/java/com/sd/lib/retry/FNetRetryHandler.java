@@ -74,6 +74,13 @@ public abstract class FNetRetryHandler extends FRetryHandler {
         }
     }
 
+    /**
+     * 网络不可用回调
+     */
+    protected void onNetworkDisconnected() {
+        Log.i(getClass().getSimpleName(), "onNetworkDisconnected isLoading:" + isLoading() + " " + this);
+    }
+
     private final class NetworkReceiver extends BroadcastReceiver {
         private final Context mContext;
         private boolean mIsNetworkConnected;
@@ -91,6 +98,8 @@ public abstract class FNetRetryHandler extends FRetryHandler {
                     mIsNetworkConnected = isConnected;
                     if (isConnected) {
                         onNetworkConnected();
+                    } else {
+                        onNetworkDisconnected();
                     }
                 }
             }
