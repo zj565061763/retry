@@ -112,7 +112,7 @@ public abstract class FRetryHandler {
         @Override
         public void run() {
             synchronized (FRetryHandler.this) {
-                if (mIsStarted) {
+                if (mIsStarted && checkRetry()) {
                     mRetryCount++;
                     mLoadSession = new InternalLoadSession();
                     onRetry(mLoadSession);
