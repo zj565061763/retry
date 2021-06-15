@@ -6,8 +6,7 @@ import android.os.Looper;
 /**
  * 重试帮助类
  */
-public abstract class FRetryHandler
-{
+public abstract class FRetryHandler {
     /**
      * 最大重试次数
      */
@@ -32,10 +31,10 @@ public abstract class FRetryHandler
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    public FRetryHandler(int maxRetryCount)
-    {
-        if (maxRetryCount <= 0)
+    public FRetryHandler(int maxRetryCount) {
+        if (maxRetryCount <= 0) {
             throw new IllegalArgumentException("maxRetryCount must > 0");
+        }
         mMaxRetryCount = maxRetryCount;
     }
 
@@ -44,8 +43,7 @@ public abstract class FRetryHandler
      *
      * @return
      */
-    public final boolean isStarted()
-    {
+    public final boolean isStarted() {
         return mIsStarted;
     }
 
@@ -54,8 +52,7 @@ public abstract class FRetryHandler
      *
      * @return
      */
-    public final int getRetryCount()
-    {
+    public final int getRetryCount() {
         return mRetryCount;
     }
 
@@ -64,8 +61,7 @@ public abstract class FRetryHandler
      *
      * @return
      */
-    public final boolean isLoading()
-    {
+    public final boolean isLoading() {
         return mIsLoading;
     }
 
@@ -74,20 +70,20 @@ public abstract class FRetryHandler
      *
      * @param retryInterval
      */
-    public synchronized void setRetryInterval(long retryInterval)
-    {
-        if (retryInterval < 0)
+    public synchronized void setRetryInterval(long retryInterval) {
+        if (retryInterval < 0) {
             retryInterval = 0;
+        }
         mRetryInterval = retryInterval;
     }
 
     /**
      * 开始重试
      */
-    public final synchronized void start()
-    {
-        if (mIsStarted)
+    public final synchronized void start() {
+        if (mIsStarted) {
             return;
+        }
 
         setStarted(true);
         retry(0);
@@ -99,25 +95,28 @@ public abstract class FRetryHandler
      * @param delayMillis 延迟多少毫秒
      * @return true-成功发起了一次重试
      */
-    final synchronized boolean retry(long delayMillis)
-    {
-        if (!mIsStarted)
+    final synchronized boolean retry(long delayMillis) {
+        if (!mIsStarted) {
             return false;
-
-        if (checkIsMaxRetry())
-            return false;
-
-        if (mIsLoading)
-            throw new RuntimeException("can not retry while loading");
-
-        if (mLoadSession != null)
-        {
-            if (!mLoadSession.nIsFinish)
-                throw new RuntimeException("last load session is not finished");
         }
 
-        if (!checkRetry())
+        if (checkIsMaxRetry()) {
             return false;
+        }
+
+        if (mIsLoading) {
+            throw new RuntimeException("can not retry while loading");
+        }
+
+        if (mLoadSession != null) {
+            if (!mLoadSession.nIsFinish) {
+                throw new RuntimeException("last load session is not finished");
+            }
+        }
+
+        if (!checkRetry()) {
+            return false;
+        }
 
         mHandler.removeCallbacks(mRetryRunnable);
         mHandler.postDelayed(mRetryRunnable, delayMillis);
@@ -129,22 +128,17 @@ public abstract class FRetryHandler
      *
      * @return
      */
-    protected boolean checkRetry()
-    {
+    protected boolean checkRetry() {
         return true;
     }
 
     private InternalLoadSession mLoadSession;
 
-    private final Runnable mRetryRunnable = new Runnable()
-    {
+    private final Runnable mRetryRunnable = new Runnable() {
         @Override
-        public void run()
-        {
-            synchronized (FRetryHandler.this)
-            {
-                if (mIsStarted)
-                {
+        public void run() {
+            synchronized (FRetryHandler.this) {
+                if (mIsStarted) {
                     mRetryCount++;
                     mLoadSession = new InternalLoadSession();
                     onRetry(mLoadSession);
@@ -158,10 +152,8 @@ public abstract class FRetryHandler
      *
      * @return true-达到最大次数
      */
-    private boolean checkIsMaxRetry()
-    {
-        if (mRetryCount >= mMaxRetryCount)
-        {
+    private boolean checkIsMaxRetry() {
+        if (mRetryCount >= mMaxRetryCount) {
             // 达到最大重试次数
             cancelInternal(false);
             onRetryMaxCount();
@@ -173,19 +165,15 @@ public abstract class FRetryHandler
     /**
      * 停止重试
      */
-    public final void cancel()
-    {
+    public final void cancel() {
         cancelInternal(true);
     }
 
-    private synchronized void cancelInternal(boolean cancelSession)
-    {
-        if (mIsStarted)
-        {
+    private synchronized void cancelInternal(boolean cancelSession) {
+        if (mIsStarted) {
             mHandler.removeCallbacks(mRetryRunnable);
 
-            if (mLoadSession != null)
-            {
+            if (mLoadSession != null) {
                 mLoadSession.nIsFinish = true;
                 mLoadSession = null;
             }
@@ -193,15 +181,14 @@ public abstract class FRetryHandler
             final boolean isLoading = mIsLoading;
             setStarted(false);
 
-            if (isLoading && cancelSession)
+            if (isLoading && cancelSession) {
                 cancelLoadSession();
+            }
         }
     }
 
-    private void setStarted(boolean started)
-    {
-        if (mIsStarted != started)
-        {
+    private void setStarted(boolean started) {
+        if (mIsStarted != started) {
             mRetryCount = 0;
             mIsLoading = false;
 
@@ -210,15 +197,13 @@ public abstract class FRetryHandler
         }
     }
 
-    protected void onStateChanged(boolean started)
-    {
+    protected void onStateChanged(boolean started) {
     }
 
     /**
      * 调用{@link #cancel()}的时候如果发现正在加载中，则会触发此方法取消加载
      */
-    protected void cancelLoadSession()
-    {
+    protected void cancelLoadSession() {
     }
 
     /**
@@ -231,54 +216,50 @@ public abstract class FRetryHandler
     /**
      * 达到最大重试次数
      */
-    protected void onRetryMaxCount()
-    {
+    protected void onRetryMaxCount() {
     }
 
-    private final class InternalLoadSession implements LoadSession
-    {
+    private final class InternalLoadSession implements LoadSession {
         private volatile boolean nIsFinish;
 
         @Override
-        public void onLoading()
-        {
-            if (nIsFinish)
+        public void onLoading() {
+            if (nIsFinish) {
                 return;
+            }
 
-            synchronized (FRetryHandler.this)
-            {
-                if (mIsStarted)
+            synchronized (FRetryHandler.this) {
+                if (mIsStarted) {
                     mIsLoading = true;
+                }
             }
         }
 
         @Override
-        public void onLoadFinish()
-        {
-            if (nIsFinish)
+        public void onLoadFinish() {
+            if (nIsFinish) {
                 return;
+            }
             nIsFinish = true;
 
             cancelInternal(false);
         }
 
         @Override
-        public void onLoadError()
-        {
-            if (nIsFinish)
+        public void onLoadError() {
+            if (nIsFinish) {
                 return;
+            }
             nIsFinish = true;
 
-            synchronized (FRetryHandler.this)
-            {
+            synchronized (FRetryHandler.this) {
                 mIsLoading = false;
                 retry(mRetryInterval);
             }
         }
     }
 
-    public interface LoadSession
-    {
+    public interface LoadSession {
         void onLoading();
 
         void onLoadFinish();
