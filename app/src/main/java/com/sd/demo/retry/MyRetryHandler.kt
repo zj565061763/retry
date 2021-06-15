@@ -3,8 +3,6 @@ package com.sd.demo.retry
 import android.content.Context
 import android.util.Log
 import com.sd.lib.retry.FNetRetryHandler
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class MyRetryHandler : FNetRetryHandler {
     private val TAG = MyRetryHandler::class.java.simpleName
