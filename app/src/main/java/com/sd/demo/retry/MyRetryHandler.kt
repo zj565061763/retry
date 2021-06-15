@@ -12,6 +12,11 @@ class MyRetryHandler : FNetRetryHandler {
         setRetryInterval(1000)
     }
 
+    override fun onStateChanged(started: Boolean) {
+        super.onStateChanged(started)
+        _count = 0
+    }
+
     override fun onRetry(session: LoadSession) {
         session.onLoading()
         _count++
