@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -35,6 +36,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
         if (mNetworkReceiver == null) {
             mNetworkReceiver = new NetworkReceiver(mContext);
             mNetworkReceiver.register();
+            Log.i(getClass().getSimpleName(), "registerReceiver");
         }
     }
 
@@ -42,6 +44,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
         if (mNetworkReceiver != null) {
             mNetworkReceiver.unregister();
             mNetworkReceiver = null;
+            Log.i(getClass().getSimpleName(), "unregisterReceiver");
         }
     }
 
@@ -70,7 +73,9 @@ public abstract class FNetRetryHandler extends FRetryHandler {
      */
     protected void onNetworkConnected(NetworkInfo networkInfo) {
         synchronized (FNetRetryHandler.this) {
-            if (!isLoading()) {
+            final boolean isLoading = isLoading();
+            Log.i(getClass().getSimpleName(), "onNetworkConnected isLoading:" + isLoading);
+            if (!isLoading) {
                 retry(0);
             }
         }
