@@ -36,7 +36,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
         if (mNetworkReceiver == null) {
             mNetworkReceiver = new NetworkReceiver(mContext);
             mNetworkReceiver.register();
-            Log.i(getClass().getSimpleName(), "registerReceiver");
+            Log.i(getClass().getSimpleName(), "registerReceiver " + this);
         }
     }
 
@@ -44,7 +44,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
         if (mNetworkReceiver != null) {
             mNetworkReceiver.unregister();
             mNetworkReceiver = null;
-            Log.i(getClass().getSimpleName(), "unregisterReceiver");
+            Log.i(getClass().getSimpleName(), "unregisterReceiver " + this);
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
     protected void onNetworkConnected() {
         synchronized (FNetRetryHandler.this) {
             final boolean isLoading = isLoading();
-            Log.i(getClass().getSimpleName(), "onNetworkConnected isLoading:" + isLoading);
+            Log.i(getClass().getSimpleName(), "onNetworkConnected isLoading:" + isLoading + " " + this);
             if (!isLoading) {
                 retry(0);
             }
