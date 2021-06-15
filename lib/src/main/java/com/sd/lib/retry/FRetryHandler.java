@@ -3,6 +3,8 @@ package com.sd.lib.retry;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 /**
  * 重试帮助类
  */
@@ -194,7 +196,7 @@ public abstract class FRetryHandler {
      *
      * @param session
      */
-    protected abstract void onRetry(LoadSession session);
+    protected abstract void onRetry(@NonNull LoadSession session);
 
     /**
      * 达到最大重试次数

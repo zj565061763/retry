@@ -30,6 +30,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.annotation:annotation:1.1.0'
 }
 
 task generateSourcesJar(type: Jar) {

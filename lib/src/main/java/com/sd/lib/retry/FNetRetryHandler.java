@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import androidx.annotation.NonNull;
+
 /**
  * 需要用到网络的重试帮助类
  */
@@ -14,7 +16,7 @@ public abstract class FNetRetryHandler extends FRetryHandler {
     private final Context mContext;
     private NetworkReceiver mNetworkReceiver;
 
-    public FNetRetryHandler(Context context, int maxRetryCount) {
+    public FNetRetryHandler(@NonNull Context context, int maxRetryCount) {
         super(maxRetryCount);
         mContext = context.getApplicationContext();
     }
