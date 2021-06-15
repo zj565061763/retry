@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.sd.lib.retry.FNetRetryHandler
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MyRetryHandler : FNetRetryHandler {
@@ -12,13 +11,12 @@ class MyRetryHandler : FNetRetryHandler {
     private var _count = 0
 
     constructor(context: Context) : super(context, 15) {
-
+        setRetryInterval(1000)
     }
 
     override fun onRetry(session: LoadSession) {
         session.onLoading()
         GlobalScope.launch {
-            delay(1000)
             _count++
             Log.i(TAG, "onRetry count:${_count}")
             if (_count >= 10) {
