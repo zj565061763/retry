@@ -18,7 +18,7 @@ public abstract class FRetryHandler {
     /** 某一次重试是否正在加载中 */
     private volatile boolean mIsLoading;
     /** 重试间隔 */
-    private long mRetryInterval = 3 * 1000;
+    private volatile long mRetryInterval = 3 * 1000;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -53,7 +53,7 @@ public abstract class FRetryHandler {
     /**
      * 设置重试间隔，默认3000毫秒
      */
-    public synchronized void setRetryInterval(long retryInterval) {
+    public void setRetryInterval(long retryInterval) {
         if (retryInterval < 0) {
             retryInterval = 0;
         }
@@ -76,7 +76,6 @@ public abstract class FRetryHandler {
      * 重试，只有{@link #isStarted()}为true，此方法才有效
      *
      * @param delayMillis 延迟多少毫秒
-     * @return true-成功发起了一次重试
      */
     final synchronized boolean retry(long delayMillis) {
         if (!mIsStarted) {
@@ -109,14 +108,6 @@ public abstract class FRetryHandler {
         return true;
     }
 
-    /**
-     * 检查是否可以发起重试
-     *
-     * @return
-     */
-    protected boolean checkRetry() {
-        return true;
-    }
 
     private InternalLoadSession mLoadSession;
 
@@ -168,6 +159,15 @@ public abstract class FRetryHandler {
             mIsStarted = started;
             onStateChanged(started);
         }
+    }
+
+    /**
+     * 检查是否可以发起重试
+     *
+     * @return
+     */
+    protected boolean checkRetry() {
+        return true;
     }
 
     protected void onStateChanged(boolean started) {
