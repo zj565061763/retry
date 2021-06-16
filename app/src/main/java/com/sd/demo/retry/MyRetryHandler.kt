@@ -15,6 +15,7 @@ class MyRetryHandler : FNetRetryHandler {
     override fun onStateChanged(started: Boolean) {
         super.onStateChanged(started)
         _count = 0
+        Log.i(TAG, "onStateChanged started:${started}")
     }
 
     override fun onRetry(session: LoadSession) {
