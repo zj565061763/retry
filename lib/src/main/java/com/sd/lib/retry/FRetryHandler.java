@@ -100,7 +100,7 @@ public abstract class FRetryHandler {
             throw new RuntimeException("can not retry while loading");
         }
 
-        if (mLoadSession != null && !mLoadSession.nIsFinish) {
+        if (mLoadSession != null && !mLoadSession._isFinish) {
             throw new RuntimeException("last load session is not finished");
         }
 
@@ -130,7 +130,7 @@ public abstract class FRetryHandler {
 
         mHandler.removeCallbacks(mRetryRunnable);
         if (mLoadSession != null) {
-            mLoadSession.nIsFinish = true;
+            mLoadSession._isFinish = true;
             mLoadSession = null;
         }
 
@@ -189,11 +189,11 @@ public abstract class FRetryHandler {
     }
 
     private final class InternalLoadSession implements LoadSession {
-        private volatile boolean nIsFinish;
+        private volatile boolean _isFinish;
 
         @Override
         public void onLoading() {
-            if (nIsFinish) {
+            if (_isFinish) {
                 return;
             }
 
@@ -206,20 +206,20 @@ public abstract class FRetryHandler {
 
         @Override
         public void onLoadFinish() {
-            if (nIsFinish) {
+            if (_isFinish) {
                 return;
             }
-            nIsFinish = true;
+            _isFinish = true;
 
             cancelInternal(false);
         }
 
         @Override
         public void onLoadError() {
-            if (nIsFinish) {
+            if (_isFinish) {
                 return;
             }
-            nIsFinish = true;
+            _isFinish = true;
 
             synchronized (FRetryHandler.this) {
                 mIsLoading = false;
