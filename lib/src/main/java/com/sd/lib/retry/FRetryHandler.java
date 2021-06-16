@@ -155,12 +155,17 @@ public abstract class FRetryHandler {
     /**
      * 检查是否可以发起重试
      *
-     * @return
+     * @return true-是；false-否
      */
     protected boolean checkRetry() {
         return true;
     }
 
+    /**
+     * 是否开始状态变化
+     *
+     * @param started true-开始；false-结束
+     */
     protected void onStateChanged(boolean started) {
     }
 
