@@ -129,7 +129,6 @@ public abstract class FRetryHandler {
         }
 
         mHandler.removeCallbacks(mRetryRunnable);
-
         if (mLoadSession != null) {
             mLoadSession.nIsFinish = true;
             mLoadSession = null;
