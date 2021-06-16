@@ -20,6 +20,7 @@ public abstract class FRetryHandler {
     /** 重试间隔 */
     private volatile long mRetryInterval = 3 * 1000;
 
+    private InternalLoadSession mLoadSession;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     public FRetryHandler(int maxRetryCount) {
@@ -101,9 +102,6 @@ public abstract class FRetryHandler {
             mHandler.postDelayed(mRetryRunnable, delayMillis);
         }
     }
-
-
-    private InternalLoadSession mLoadSession;
 
     private final Runnable mRetryRunnable = new Runnable() {
         @Override
