@@ -73,6 +73,13 @@ public abstract class FRetryHandler {
     }
 
     /**
+     * 停止重试
+     */
+    public final void cancel() {
+        cancelInternal(true);
+    }
+
+    /**
      * 重试
      *
      * @param delayMillis 延迟多少毫秒
@@ -115,13 +122,6 @@ public abstract class FRetryHandler {
             }
         }
     };
-
-    /**
-     * 停止重试
-     */
-    public final void cancel() {
-        cancelInternal(true);
-    }
 
     private synchronized void cancelInternal(boolean cancelSession) {
         if (!mIsStarted) {
