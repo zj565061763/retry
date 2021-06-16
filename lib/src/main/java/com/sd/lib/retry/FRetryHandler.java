@@ -53,11 +53,11 @@ public abstract class FRetryHandler {
     /**
      * 设置重试间隔，默认3000毫秒
      */
-    public void setRetryInterval(long retryInterval) {
-        if (retryInterval < 0) {
-            retryInterval = 0;
+    public final void setRetryInterval(long interval) {
+        if (interval < 0) {
+            interval = 0;
         }
-        mRetryInterval = retryInterval;
+        mRetryInterval = interval;
     }
 
     /**
@@ -67,7 +67,6 @@ public abstract class FRetryHandler {
         if (mIsStarted) {
             return;
         }
-
         setStarted(true);
         retry(0);
     }
