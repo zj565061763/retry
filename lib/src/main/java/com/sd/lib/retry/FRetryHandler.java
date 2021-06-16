@@ -72,7 +72,7 @@ public abstract class FRetryHandler {
     }
 
     /**
-     * 重试，只有{@link #isStarted()}为true，此方法才有效
+     * 重试
      *
      * @param delayMillis 延迟多少毫秒
      */
@@ -92,10 +92,8 @@ public abstract class FRetryHandler {
             throw new RuntimeException("can not retry while loading");
         }
 
-        if (mLoadSession != null) {
-            if (!mLoadSession.nIsFinish) {
-                throw new RuntimeException("last load session is not finished");
-            }
+        if (mLoadSession != null && !mLoadSession.nIsFinish) {
+            throw new RuntimeException("last load session is not finished");
         }
 
         if (checkRetry()) {
