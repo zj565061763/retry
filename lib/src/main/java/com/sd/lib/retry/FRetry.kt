@@ -105,7 +105,9 @@ abstract class FRetry(maxRetryCount: Int) {
                 null
             }
         }?.let {
-            onRetry(it)
+            if (!onRetry(it)) {
+                cancel()
+            }
         }
     }
 
@@ -122,9 +124,9 @@ abstract class FRetry(maxRetryCount: Int) {
     protected open fun onStateChanged(started: Boolean) {}
 
     /**
-     * 执行重试任务（UI线程）
+     * 执行重试任务（UI线程），返回false将结束重试。
      */
-    abstract fun onRetry(session: LoadSession)
+    abstract fun onRetry(session: LoadSession): Boolean
 
     /**
      * 达到最大重试次数（UI线程）
