@@ -93,6 +93,7 @@ abstract class FRetry(
         }
 
         if (!checkRetry()) {
+            // TODO 标记暂停
             return
         }
 
