@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.Log
 import com.sd.lib.retry.FNetRetryHandler
 
-class MyRetryHandler : FNetRetryHandler {
-    private val TAG = MyRetryHandler::class.java.simpleName
+class MyRetry(context: Context) : FNetRetryHandler(context, 15) {
+    private val TAG = MyRetry::class.java.simpleName
     private var _count = 0
 
-    constructor(context: Context) : super(context, 15) {
+    init {
         setRetryInterval(1000)
     }
 

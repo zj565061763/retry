@@ -6,25 +6,23 @@ import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.retry.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
-    private lateinit var _binding: ActivityMainBinding
-    private lateinit var _retryHandler: MyRetryHandler
+    private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val _retry by lazy { MyRetry(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(_binding.root)
-        _retryHandler = MyRetryHandler(this)
     }
 
     override fun onClick(v: View) {
         when (v) {
-            _binding.btnStart -> _retryHandler.start()
-            _binding.btnStop -> _retryHandler.cancel()
+            _binding.btnStart -> _retry.start()
+            _binding.btnStop -> _retry.cancel()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        _retryHandler.cancel()
+        _retry.cancel()
     }
 }
