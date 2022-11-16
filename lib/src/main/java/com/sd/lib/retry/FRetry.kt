@@ -9,12 +9,7 @@ abstract class FRetry(maxRetryCount: Int) {
     /** 重试是否已经开始 */
     @Volatile
     var isStarted: Boolean = false
-        private set(value) {
-            if (field != value) {
-                field = value
-                retryCount = 0
-            }
-        }
+        private set
 
     /** 当前第几次重试 */
     @Volatile
@@ -52,6 +47,7 @@ abstract class FRetry(maxRetryCount: Int) {
         synchronized(this@FRetry) {
             if (isStarted) return
             isStarted = true
+            retryCount = 0
         }
         retry(0)
         onStateChanged(true)
