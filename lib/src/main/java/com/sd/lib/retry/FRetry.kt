@@ -52,7 +52,7 @@ abstract class FRetry(
             retryCount = 0
         }
         retryDelayed(0)
-        onStateChanged(true)
+        onStart()
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class FRetry(
             _loadSession = null
             isStarted = false
         }
-        onStateChanged(false)
+        onStop()
     }
 
     /**
@@ -119,9 +119,14 @@ abstract class FRetry(
     }
 
     /**
-     * 是否开始状态变化
+     * 开始回调
      */
-    protected open fun onStateChanged(started: Boolean) {}
+    protected open fun onStart() {}
+
+    /**
+     * 结束回调
+     */
+    protected open fun onStop() {}
 
     /**
      * 执行重试任务（UI线程），返回false将结束重试。
