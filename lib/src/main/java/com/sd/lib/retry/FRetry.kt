@@ -58,15 +58,16 @@ abstract class FRetry(
     /**
      * 停止重试
      */
-    fun cancel() {
+    fun cancel(): Boolean {
         synchronized(this@FRetry) {
-            if (!isStarted) return
+            if (!isStarted) return false
             _mainHandler.removeCallbacks(_retryRunnable)
             _loadSession?.let { it._isFinish = true }
             _loadSession = null
             isStarted = false
         }
         onStateChanged(false)
+        return true
     }
 
     /**
@@ -87,9 +88,7 @@ abstract class FRetry(
         }
 
         if (isRetryMaxCount) {
-            // TODO 检查重复触发逻辑
-            cancel()
-            onRetryMaxCount()
+            if (cancel()) onRetryMaxCount()
         } else {
             if (checkRetry()) {
                 synchronized(this@FRetry) {
