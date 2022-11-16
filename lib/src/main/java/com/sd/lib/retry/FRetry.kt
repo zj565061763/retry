@@ -57,7 +57,18 @@ abstract class FRetry(maxRetryCount: Int) {
      * 停止重试
      */
     fun cancel() {
-        cancelInternal(true)
+        synchronized(this@FRetry) {
+            if (!isStarted) return
+
+            _mainHandler.removeCallbacks(_retryRunnable)
+            _loadSession?.let {
+                it._isFinish = true
+                _loadSession = null
+            }
+
+            isStarted = false
+        }
+        onStateChanged(false)
     }
 
     /**
@@ -72,7 +83,7 @@ abstract class FRetry(maxRetryCount: Int) {
 
         if (isRetryMaxCount) {
             // TODO 检查重复触发逻辑
-            cancelInternal(false)
+            cancel()
             _mainHandler.post { onRetryMaxCount() }
             return
         }
@@ -93,12 +104,9 @@ abstract class FRetry(maxRetryCount: Int) {
             } else {
                 null
             }
-        }?.let { onRetry(it) }
-    }
-
-    @Synchronized
-    private fun cancelInternal(cancelSession: Boolean) {
-        if (!isStarted) return
+        }?.let {
+            onRetry(it)
+        }
     }
 
     /**
@@ -124,9 +132,8 @@ abstract class FRetry(maxRetryCount: Int) {
     protected open fun onRetryMaxCount() {}
 
     private inner class InternalLoadSession : LoadSession {
-        @Volatile
         var _isFinish = false
-            private set(value) {
+            set(value) {
                 require(value) { "Require true value." }
                 field = value
                 if (_loadSession == this) {
@@ -139,7 +146,7 @@ abstract class FRetry(maxRetryCount: Int) {
                 if (_isFinish) return
                 _isFinish = true
             }
-            cancelInternal(false)
+            cancel()
         }
 
         override fun onLoadError() {
