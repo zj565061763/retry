@@ -92,18 +92,20 @@ abstract class FRetry(
             return
         }
 
-        if (checkRetry()) {
-            synchronized(this@FRetry) {
-                if (isStarted) {
-                    retryCount++
-                    InternalLoadSession().also { _loadSession = it }
-                } else {
-                    null
-                }
-            }?.let {
-                if (!onRetry(it)) {
-                    cancel()
-                }
+        if (!checkRetry()) {
+            return
+        }
+
+        synchronized(this@FRetry) {
+            if (isStarted) {
+                retryCount++
+                InternalLoadSession().also { _loadSession = it }
+            } else {
+                null
+            }
+        }?.let {
+            if (!onRetry(it)) {
+                cancel()
             }
         }
     }
