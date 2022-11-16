@@ -93,6 +93,7 @@ abstract class FRetry(
         }
 
         if (!checkRetry()) {
+            check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
             // TODO 标记暂停
             return
         }
