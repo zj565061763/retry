@@ -156,7 +156,9 @@ abstract class FRetry(
                 if (_isFinish) return
                 _isFinish = true
             }
-            retryDelayed(_retryInterval)
+
+            val delay = if (retryCount >= maxRetryCount) 0 else _retryInterval
+            retryDelayed(delay)
         }
     }
 
