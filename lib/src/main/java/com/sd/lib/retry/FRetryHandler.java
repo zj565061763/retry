@@ -11,12 +11,16 @@ import androidx.annotation.NonNull;
 public abstract class FRetryHandler {
     /** 最大重试次数 */
     private final int mMaxRetryCount;
+
     /** 重试是否已经开始 */
     private volatile boolean mIsStarted;
+
     /** 当前第几次重试 */
     private volatile int mRetryCount;
+
     /** 某一次重试是否正在加载中 */
     private volatile boolean mIsLoading;
+
     /** 重试间隔 */
     private volatile long mRetryInterval = 3 * 1000;
 
