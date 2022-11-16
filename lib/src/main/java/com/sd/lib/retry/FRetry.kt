@@ -8,7 +8,7 @@ abstract class FRetry(maxRetryCount: Int) {
 
     /** 重试是否已经开始 */
     @Volatile
-    var isStarted = false
+    var isStarted: Boolean = false
         private set(value) {
             if (field != value) {
                 field = value
@@ -18,18 +18,20 @@ abstract class FRetry(maxRetryCount: Int) {
 
     /** 当前第几次重试 */
     @Volatile
-    var retryCount = 0
+    var retryCount: Int = 0
         private set
 
-    /** 某一次重试是否正在加载中 */
-    val isLoading
-        get() = _loadSession?._isFinish == false
+    /** 某一次重试是否在加载中 */
+    val isLoading: Boolean
+        get() = _loadSession != null
 
     /** 重试间隔 */
     @Volatile
-    private var _retryInterval = 3_000L
+    private var _retryInterval: Long = 3_000L
 
+    @Volatile
     private var _loadSession: InternalLoadSession? = null
+
     private val _mainHandler = Handler(Looper.getMainLooper())
 
     init {
@@ -127,30 +129,18 @@ abstract class FRetry(maxRetryCount: Int) {
 
     private inner class InternalLoadSession : LoadSession {
         @Volatile
-        var _isFinish: Boolean? = null
+        var _isFinish = false
             private set(value) {
-                if (field != value) {
-                    check(field == null) { "Cannot set value when field is not null." }
-                    field = value
-                    if (value == true) {
-                        check(_loadSession == this)
-                        _loadSession = null
-                    }
+                require(value) { "Require true value." }
+                field = value
+                if (_loadSession == this) {
+                    _loadSession = null
                 }
             }
-
-        override fun onLoading() {
-            synchronized(this@FRetry) {
-                if (_isFinish == true) return
-                if (_isFinish == null) {
-                    _isFinish = !isStarted
-                }
-            }
-        }
 
         override fun onLoadFinish() {
             synchronized(this@FRetry) {
-                if (_isFinish == true) return
+                if (_isFinish) return
                 _isFinish = true
             }
             cancelInternal(false)
@@ -158,7 +148,7 @@ abstract class FRetry(maxRetryCount: Int) {
 
         override fun onLoadError() {
             synchronized(this@FRetry) {
-                if (_isFinish == true) return
+                if (_isFinish) return
                 _isFinish = true
             }
             retry(_retryInterval)
@@ -166,7 +156,6 @@ abstract class FRetry(maxRetryCount: Int) {
     }
 
     interface LoadSession {
-        fun onLoading()
         fun onLoadFinish()
         fun onLoadError()
     }
