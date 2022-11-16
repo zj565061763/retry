@@ -62,10 +62,8 @@ abstract class FRetry(
         synchronized(this@FRetry) {
             if (!isStarted) return
             _mainHandler.removeCallbacks(_retryRunnable)
-            _loadSession?.let {
-                it._isFinish = true
-                _loadSession = null
-            }
+            _loadSession?.let { it._isFinish = true }
+            _loadSession = null
             isStarted = false
         }
         onStateChanged(false)
