@@ -1,11 +1,9 @@
 package com.sd.demo.retry
 
 import android.content.Context
-import android.util.Log
 import com.sd.lib.retry.FNetRetryHandler
 
-class MyRetry(context: Context) : FNetRetryHandler(context, 15) {
-    private val TAG = MyRetry::class.java.simpleName
+class MyRetry(context: Context) : FNetRetryHandler(context, 10) {
     private var _count = 0
 
     init {
@@ -14,16 +12,16 @@ class MyRetry(context: Context) : FNetRetryHandler(context, 15) {
 
     override fun onStateChanged(started: Boolean) {
         super.onStateChanged(started)
+        logMsg { "onStateChanged $started" }
         _count = 0
-        Log.i(TAG, "onStateChanged started:${started}")
     }
 
     override fun onRetry(session: LoadSession) {
         session.onLoading()
-        _count++
-        Log.i(TAG, "onRetry count:${_count}")
+        logMsg { "onRetry $retryCount" }
 
-        if (_count >= 10) {
+        _count++
+        if (_count >= 5) {
             session.onLoadFinish()
         } else {
             session.onLoadError()
@@ -32,6 +30,6 @@ class MyRetry(context: Context) : FNetRetryHandler(context, 15) {
 
     override fun onRetryMaxCount() {
         super.onRetryMaxCount()
-        Log.i(TAG, "onRetryMaxCount")
+        logMsg { "onRetryMaxCount" }
     }
 }

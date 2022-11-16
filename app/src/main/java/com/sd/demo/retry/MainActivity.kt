@@ -1,6 +1,7 @@
 package com.sd.demo.retry
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.retry.databinding.ActivityMainBinding
@@ -25,4 +26,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onDestroy()
         _retry.cancel()
     }
+}
+
+inline fun logMsg(block: () -> String) {
+    Log.i("FRetry-demo", block())
 }
