@@ -82,6 +82,15 @@ abstract class FRetry(
         _mainHandler.postDelayed(_retryRunnable, delayMillis)
     }
 
+    internal fun resumeRetry() {
+        synchronized(this@FRetry) {
+            if (_isRetryPaused) {
+                _isRetryPaused = false
+                retryDelayed(0)
+            }
+        }
+    }
+
     private fun tryInternal() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
@@ -98,8 +107,10 @@ abstract class FRetry(
         }
 
         if (!checkRetry()) {
-            check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
-            _isRetryPaused = true
+            synchronized(this@FRetry) {
+                check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
+                _isRetryPaused = true
+            }
             return
         }
 
