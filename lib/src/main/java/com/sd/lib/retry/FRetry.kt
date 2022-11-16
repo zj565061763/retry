@@ -51,7 +51,7 @@ abstract class FRetry(maxRetryCount: Int) {
             retryCount = 0
         }
 
-        retry(0)
+        retryDelayed(0)
         if (isStarted) {
             onStateChanged(true)
         }
@@ -76,7 +76,7 @@ abstract class FRetry(maxRetryCount: Int) {
     /**
      * 延迟[delayMillis]毫秒重试
      */
-    private fun retry(delayMillis: Long) {
+    private fun retryDelayed(delayMillis: Long) {
         _mainHandler.removeCallbacks(_retryRunnable)
         _mainHandler.postDelayed(_retryRunnable, delayMillis)
     }
@@ -157,7 +157,7 @@ abstract class FRetry(maxRetryCount: Int) {
                 if (_isFinish) return
                 _isFinish = true
             }
-            retry(_retryInterval)
+            retryDelayed(_retryInterval)
         }
     }
 
