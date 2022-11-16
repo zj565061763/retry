@@ -49,8 +49,11 @@ abstract class FRetry(maxRetryCount: Int) {
             isStarted = true
             retryCount = 0
         }
+
         retry(0)
-        onStateChanged(true)
+        if (isStarted) {
+            onStateChanged(true)
+        }
     }
 
     /**
