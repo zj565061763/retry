@@ -3,9 +3,10 @@ package com.sd.lib.retry
 import android.os.Handler
 import android.os.Looper
 
-abstract class FRetry(maxRetryCount: Int) {
-    private val _maxRetryCount = maxRetryCount
-
+abstract class FRetry(
+    /** 最大重试次数 */
+    val maxRetryCount: Int
+) {
     /** 重试是否已经开始 */
     @Volatile
     var isStarted: Boolean = false
@@ -87,7 +88,7 @@ abstract class FRetry(maxRetryCount: Int) {
         val isRetryMaxCount = synchronized(this@FRetry) {
             if (!isStarted) return
             if (isLoading) error("Current LoadSession is not finished.")
-            retryCount >= _maxRetryCount
+            retryCount >= maxRetryCount
         }
 
         if (isRetryMaxCount) {
