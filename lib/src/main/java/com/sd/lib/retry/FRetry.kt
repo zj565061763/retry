@@ -128,7 +128,16 @@ abstract class FRetry(maxRetryCount: Int) {
     private inner class InternalLoadSession : LoadSession {
         @Volatile
         var _isFinish: Boolean? = null
-            private set
+            private set(value) {
+                if (field != value) {
+                    check(field == null) { "Cannot set value when field is not null." }
+                    field = value
+                    if (value == true) {
+                        check(_loadSession == this)
+                        _loadSession = null
+                    }
+                }
+            }
 
         override fun onLoading() {
             synchronized(this@FRetry) {
