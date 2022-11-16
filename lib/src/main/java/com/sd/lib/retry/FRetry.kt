@@ -51,11 +51,8 @@ abstract class FRetry(
             isStarted = true
             retryCount = 0
         }
-
         retryDelayed(0)
-        if (isStarted) {
-            onStateChanged(true)
-        }
+        onStateChanged(true)
     }
 
     /**
