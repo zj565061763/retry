@@ -28,6 +28,7 @@ abstract class FRetry(maxRetryCount: Int) {
     private var _loadSession: InternalLoadSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
+    private val _retryRunnable = Runnable { tryInternal() }
 
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
@@ -76,6 +77,13 @@ abstract class FRetry(maxRetryCount: Int) {
      * 延迟[delayMillis]毫秒重试
      */
     private fun retry(delayMillis: Long) {
+        _mainHandler.removeCallbacks(_retryRunnable)
+        _mainHandler.postDelayed(_retryRunnable, delayMillis)
+    }
+
+    private fun tryInternal() {
+        check(Looper.myLooper() == Looper.getMainLooper())
+
         val isRetryMaxCount = synchronized(this@FRetry) {
             if (!isStarted) return
             if (isLoading) error("Current LoadSession is not finished.")
@@ -85,25 +93,21 @@ abstract class FRetry(maxRetryCount: Int) {
         if (isRetryMaxCount) {
             // TODO 检查重复触发逻辑
             cancel()
-            _mainHandler.post { onRetryMaxCount() }
-            return
-        }
-
-        _mainHandler.removeCallbacks(_retryRunnable)
-        _mainHandler.postDelayed(_retryRunnable, delayMillis)
-    }
-
-    private val _retryRunnable = Runnable {
-        synchronized(this@FRetry) {
-            if (isStarted && checkRetry()) {
-                retryCount++
-                InternalLoadSession().also { _loadSession = it }
-            } else {
-                null
-            }
-        }?.let {
-            if (!onRetry(it)) {
-                cancel()
+            onRetryMaxCount()
+        } else {
+            if (checkRetry()) {
+                synchronized(this@FRetry) {
+                    if (isStarted) {
+                        retryCount++
+                        InternalLoadSession().also { _loadSession = it }
+                    } else {
+                        null
+                    }
+                }?.let {
+                    if (!onRetry(it)) {
+                        cancel()
+                    }
+                }
             }
         }
     }
