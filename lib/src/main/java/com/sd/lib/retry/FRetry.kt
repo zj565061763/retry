@@ -17,16 +17,16 @@ abstract class FRetry(
     var retryCount: Int = 0
         private set
 
-    /** 某一次重试是否在加载中 */
-    val isLoading: Boolean
-        get() = _loadSession != null
-
     /** 重试间隔 */
     @Volatile
     private var _retryInterval: Long = 3_000L
 
     @Volatile
     private var _loadSession: InternalLoadSession? = null
+
+    /** 某一次重试是否在加载中 */
+    private val isLoading: Boolean
+        get() = _loadSession != null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { tryInternal() }
