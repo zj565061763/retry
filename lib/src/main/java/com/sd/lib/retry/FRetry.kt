@@ -28,6 +28,8 @@ abstract class FRetry(
     private val isLoading: Boolean
         get() = _loadSession != null
 
+    private var _isRetryPaused = false
+
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { tryInternal() }
 
@@ -50,6 +52,7 @@ abstract class FRetry(
             if (isStarted) return
             isStarted = true
             retryCount = 0
+            _isRetryPaused = false
         }
         retryDelayed(0)
         onStart()
@@ -64,6 +67,8 @@ abstract class FRetry(
             _mainHandler.removeCallbacks(_retryRunnable)
             _loadSession?.let { it._isFinish = true }
             _loadSession = null
+
+            _isRetryPaused = false
             isStarted = false
         }
         onStop()
@@ -94,7 +99,7 @@ abstract class FRetry(
 
         if (!checkRetry()) {
             check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
-            // TODO 标记暂停
+            _isRetryPaused = true
             return
         }
 
