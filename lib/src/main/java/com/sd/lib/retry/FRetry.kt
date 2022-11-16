@@ -75,7 +75,7 @@ abstract class FRetry(maxRetryCount: Int) {
     /**
      * 延迟[delayMillis]毫秒重试
      */
-    internal fun retry(delayMillis: Long) {
+    private fun retry(delayMillis: Long) {
         val isRetryMaxCount = synchronized(this@FRetry) {
             if (!isStarted) return
             if (isLoading) error("Current LoadSession is not finished.")
@@ -89,12 +89,8 @@ abstract class FRetry(maxRetryCount: Int) {
             return
         }
 
-        synchronized(this@FRetry) {
-            if (checkRetry()) {
-                _mainHandler.removeCallbacks(_retryRunnable)
-                _mainHandler.postDelayed(_retryRunnable, delayMillis)
-            }
-        }
+        _mainHandler.removeCallbacks(_retryRunnable)
+        _mainHandler.postDelayed(_retryRunnable, delayMillis)
     }
 
     private val _retryRunnable = Runnable {
