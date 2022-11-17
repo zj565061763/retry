@@ -135,34 +135,35 @@ abstract class FRetry(
     }
 
     /**
-     * 返回是否可以发起重试
+     * 检查是否可以发起重试（UI线程），此方法被调用时已经synchronized了当前对象，
+     * 返回false会触发[onPause]回调
      */
     protected open fun checkRetry(): Boolean {
         return true
     }
 
     /**
-     * 开始回调
+     * 开始回调（UI线程）
      */
     protected open fun onStart() {}
 
     /**
-     * 暂停回调，[checkRetry]返回false的时候触发
+     * 暂停回调（UI线程）
      */
     protected open fun onPause() {}
 
     /**
-     * 结束回调
+     * 结束回调（UI线程）
      */
     protected open fun onStop() {}
 
     /**
-     * 执行重试任务（UI线程），返回false将结束重试
+     * 重试回调（UI线程），返回false将结束重试
      */
     abstract fun onRetry(session: LoadSession): Boolean
 
     /**
-     * 达到最大重试次数（UI线程）
+     * 达到最大重试次数回调（UI线程）
      */
     protected open fun onRetryMaxCount() {}
 
