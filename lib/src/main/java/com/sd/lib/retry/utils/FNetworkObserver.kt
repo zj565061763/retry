@@ -29,7 +29,9 @@ abstract class FNetworkObserver() {
 
     fun register(context: Context) {
         _context = context.applicationContext.also {
-            _isNetworkAvailable = isNetworkAvailable(it)
+            if (_isNetworkAvailable == null) {
+                _isNetworkAvailable = isNetworkAvailable(it)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
