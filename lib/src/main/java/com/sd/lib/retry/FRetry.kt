@@ -79,7 +79,9 @@ abstract class FRetry(
         synchronized(this@FRetry) {
             if (_isRetryPaused) {
                 _isRetryPaused = false
-                retryDelayed(0)
+                if (isStarted) {
+                    retryDelayed(0)
+                }
             }
         }
     }
