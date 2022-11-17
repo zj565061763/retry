@@ -26,7 +26,7 @@ class AppRetry(context: Context, maxRetryCount: Int) : FNetRetry(context, maxRet
         logMsg { "AppRetry onStop" }
     }
 
-    override fun onRetry(session: LoadSession): Boolean {
+    override fun onRetry(session: Session): Boolean {
         logMsg { "AppRetry onRetry $retryCount" }
 
         _count++

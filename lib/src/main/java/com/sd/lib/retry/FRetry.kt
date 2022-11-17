@@ -20,7 +20,7 @@ abstract class FRetry(
     /** 重试间隔 */
     @Volatile
     private var _retryInterval: Long = 3_000L
-    private var _loadSession: InternalLoadSession? = null
+    private var _currentSession: InternalSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { retryOnUiThread() }
@@ -62,8 +62,8 @@ abstract class FRetry(
         state = State.Idle
 
         _mainHandler.removeCallbacks(_retryRunnable)
-        _loadSession?.let { it.isFinish = true }
-        _loadSession = null
+        _currentSession?.let { it.isFinish = true }
+        _currentSession = null
 
         val notifyRetryMax = checkRetryCount && retryCount >= maxRetryCount
         _mainHandler.post {
@@ -96,10 +96,10 @@ abstract class FRetry(
     private fun retryOnUiThread() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
-        var session: LoadSession? = null
+        var session: Session? = null
         synchronized(this@FRetry) {
             if (state != State.Running) return
-            if (_loadSession != null) error("Current LoadSession is not finished.")
+            if (_currentSession != null) error("Current LoadSession is not finished.")
 
             if (retryCount >= maxRetryCount) {
                 cancelInternal(true)
@@ -116,7 +116,7 @@ abstract class FRetry(
             }
 
             retryCount++
-            _loadSession = InternalLoadSession().also {
+            _currentSession = InternalSession().also {
                 session = it
             }
         }
@@ -161,20 +161,20 @@ abstract class FRetry(
     /**
      * 重试回调（UI线程），返回false将停止重试
      */
-    abstract fun onRetry(session: LoadSession): Boolean
+    abstract fun onRetry(session: Session): Boolean
 
     /**
      * 达到最大重试次数回调（UI线程）
      */
     protected open fun onRetryMaxCount() {}
 
-    private inner class InternalLoadSession : LoadSession {
+    private inner class InternalSession : Session {
         var isFinish = false
             set(value) {
                 require(value) { "Require true value." }
                 field = value
-                if (_loadSession == this) {
-                    _loadSession = null
+                if (_currentSession == this) {
+                    _currentSession = null
                 }
             }
 
@@ -198,7 +198,7 @@ abstract class FRetry(
         }
     }
 
-    interface LoadSession {
+    interface Session {
         fun onFinish()
         fun onError()
     }
