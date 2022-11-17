@@ -16,13 +16,18 @@ class MyRetry(context: Context) : FNetRetry(context, 10) {
         _count = 0
     }
 
+    override fun onPause() {
+        super.onPause()
+        logMsg { "MyRetry onPause" }
+    }
+
     override fun onStop() {
         super.onStop()
         logMsg { "MyRetry onStop" }
     }
 
     override fun onRetry(session: LoadSession): Boolean {
-        logMsg { "onRetry $retryCount" }
+        logMsg { "MyRetry onRetry $retryCount" }
 
         _count++
         if (_count >= 5) {
@@ -36,6 +41,6 @@ class MyRetry(context: Context) : FNetRetry(context, 10) {
 
     override fun onRetryMaxCount() {
         super.onRetryMaxCount()
-        logMsg { "onRetryMaxCount" }
+        logMsg { "MyRetry onRetryMaxCount" }
     }
 }
