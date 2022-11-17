@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -48,6 +49,16 @@ abstract class NetworkObserver(context: Context) {
     // Callback
     private inner class InternalNetworkCallback : ConnectivityManager.NetworkCallback() {
         private val _hasRegister = AtomicBoolean()
+
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            _isNetworkAvailable = true
+        }
+
+        override fun onUnavailable() {
+            super.onUnavailable()
+            _isNetworkAvailable = false
+        }
 
         @RequiresApi(Build.VERSION_CODES.N)
         fun register() {
