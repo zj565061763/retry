@@ -21,11 +21,7 @@ abstract class FNetworkObserver() {
         set(value) {
             if (field != value) {
                 field = value
-                when (value) {
-                    true -> onAvailable()
-                    false -> onLost()
-                    else -> {}
-                }
+                notifyCallback(value)
             }
         }
 
@@ -49,6 +45,14 @@ abstract class FNetworkObserver() {
             _networkReceiver.unregister(context)
         }
         _isNetworkAvailable = null
+    }
+
+    private fun notifyCallback(isAvailable: Boolean?) {
+        when (isAvailable) {
+            true -> onAvailable()
+            false -> onLost()
+            else -> {}
+        }
     }
 
     abstract fun onAvailable()
