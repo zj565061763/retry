@@ -9,7 +9,8 @@ import com.sd.lib.retry.utils.FNetworkObserver
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private val _retry by lazy { AppRetry(this) }
+
+    private val _retry by lazy { AppRetry(this, 15) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

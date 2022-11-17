@@ -3,7 +3,7 @@ package com.sd.lib.retry
 import android.content.Context
 import com.sd.lib.retry.utils.FNetworkObserver
 
-abstract class FNetRetry(maxRetryCount: Int, context: Context) : FRetry(maxRetryCount) {
+abstract class FNetRetry(context: Context, maxRetryCount: Int) : FRetry(maxRetryCount) {
     private val _context = context.applicationContext
 
     override fun checkRetry(): Boolean {
