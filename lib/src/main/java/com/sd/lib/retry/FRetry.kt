@@ -69,10 +69,12 @@ abstract class FRetry(
         _loadSession = null
         _isRetryPaused = false
 
-        _mainHandler.post { onStop() }
-
-        if (checkRetryCount && retryCount >= maxRetryCount) {
-            _mainHandler.post { onRetryMaxCount() }
+        val notifyRetryMax = checkRetryCount && retryCount >= maxRetryCount
+        _mainHandler.post {
+            onStop()
+            if (notifyRetryMax) {
+                onRetryMaxCount()
+            }
         }
     }
 
@@ -109,19 +111,17 @@ abstract class FRetry(
             return
         }
 
-        if (!checkRetry()) {
-            synchronized(this@FRetry) {
+        synchronized(this@FRetry) {
+            if (!checkRetry()) {
                 if (!_isRetryPaused && isStarted) {
                     _isRetryPaused = true
-                    true
-                } else false
-            }.let {
-                if (it) onPause()
+                    _mainHandler.post { onPause() }
+                }
+                return
             }
-            return
+            _isRetryPaused = false
         }
 
-        _isRetryPaused = false
         synchronized(this@FRetry) {
             if (isStarted) {
                 retryCount++
