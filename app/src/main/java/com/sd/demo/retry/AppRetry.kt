@@ -31,9 +31,9 @@ class AppRetry(context: Context, maxRetryCount: Int) : FNetRetry(context, maxRet
 
         _count++
         if (_count >= 10) {
-            session.onLoadFinish()
+            session.onFinish()
         } else {
-            session.onLoadError()
+            session.onError()
         }
 
         return true

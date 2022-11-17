@@ -178,7 +178,7 @@ abstract class FRetry(
                 }
             }
 
-        override fun onLoadFinish() {
+        override fun onFinish() {
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
@@ -187,7 +187,7 @@ abstract class FRetry(
             }
         }
 
-        override fun onLoadError() {
+        override fun onError() {
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
@@ -199,8 +199,8 @@ abstract class FRetry(
     }
 
     interface LoadSession {
-        fun onLoadFinish()
-        fun onLoadError()
+        fun onFinish()
+        fun onError()
     }
 
     enum class State {
