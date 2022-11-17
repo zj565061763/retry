@@ -99,6 +99,7 @@ abstract class FRetry(
     private fun tryInternal() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
+        var session: LoadSession? = null
         synchronized(this@FRetry) {
             if (!isStarted) return
             check(_loadSession == null) { "Current LoadSession is not finished." }
@@ -109,25 +110,22 @@ abstract class FRetry(
             }
 
             if (!checkRetry()) {
-                if (!_isRetryPaused && isStarted) {
+                check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
+                if (!_isRetryPaused) {
                     _isRetryPaused = true
                     _mainHandler.post { onPause() }
                 }
                 return
             }
+
             _isRetryPaused = false
-
-
+            retryCount++
+            _loadSession = InternalLoadSession().also {
+                session = it
+            }
         }
 
-        synchronized(this@FRetry) {
-            if (isStarted) {
-                retryCount++
-                InternalLoadSession().also { _loadSession = it }
-            } else {
-                null
-            }
-        }?.let {
+        session?.let {
             if (!onRetry(it)) {
                 cancel()
             }
