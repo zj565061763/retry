@@ -5,11 +5,11 @@ import android.os.Looper
 
 abstract class FRetry(
     /** 最大重试次数 */
-    val maxRetryCount: Int
+    private val maxRetryCount: Int
 ) {
-    /** 重试是否已经开始 */
+    /** 当前状态 */
     @Volatile
-    var isStarted: Boolean = false
+    var state: State = State.Idle
         private set
 
     /** 当前第几次重试 */
@@ -20,9 +20,6 @@ abstract class FRetry(
     /** 重试间隔 */
     @Volatile
     private var _retryInterval: Long = 3_000L
-
-    @Volatile
-    private var _isRetryPaused = false
     private var _loadSession: InternalLoadSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
@@ -44,8 +41,8 @@ abstract class FRetry(
      */
     @Synchronized
     fun start() {
-        if (isStarted) return
-        isStarted = true
+        if (state != State.Idle) return
+        state = State.Running
 
         retryCount = 0
         _mainHandler.post { onStart() }
@@ -61,13 +58,12 @@ abstract class FRetry(
 
     @Synchronized
     private fun cancelInternal(checkRetryCount: Boolean = false) {
-        if (!isStarted) return
-        isStarted = false
+        if (state == State.Idle) return
+        state = State.Idle
 
         _mainHandler.removeCallbacks(_retryRunnable)
         _loadSession?.let { it.isFinish = true }
         _loadSession = null
-        _isRetryPaused = false
 
         val notifyRetryMax = checkRetryCount && retryCount >= maxRetryCount
         _mainHandler.post {
@@ -88,11 +84,9 @@ abstract class FRetry(
 
     @Synchronized
     internal fun resumeRetry() {
-        if (_isRetryPaused) {
-            _isRetryPaused = false
-            if (isStarted && _loadSession == null) {
-                retryDelayed(0)
-            }
+        if (state == State.Paused) {
+            state = State.Running
+            retryDelayed(0)
         }
     }
 
@@ -101,8 +95,8 @@ abstract class FRetry(
 
         var session: LoadSession? = null
         synchronized(this@FRetry) {
-            if (!isStarted) return
-            check(_loadSession == null) { "Current LoadSession is not finished." }
+            if (state != State.Running) return
+            if (_loadSession != null) return
 
             if (retryCount >= maxRetryCount) {
                 cancelInternal(true)
@@ -110,17 +104,14 @@ abstract class FRetry(
             }
 
             val checkRetry = checkRetry()
-            check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
+            check(state == State.Running) { "Cannot cancel retry in checkRetry() callback." }
 
             if (!checkRetry) {
-                if (!_isRetryPaused) {
-                    _isRetryPaused = true
-                    _mainHandler.post { onPause() }
-                }
+                state = State.Paused
+                _mainHandler.post { onPause() }
                 return
             }
 
-            _isRetryPaused = false
             retryCount++
             _loadSession = InternalLoadSession().also {
                 session = it
@@ -200,5 +191,11 @@ abstract class FRetry(
     interface LoadSession {
         fun onLoadFinish()
         fun onLoadError()
+    }
+
+    enum class State {
+        Idle,
+        Running,
+        Paused
     }
 }
