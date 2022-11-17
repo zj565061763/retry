@@ -17,16 +17,15 @@ abstract class FNetworkObserver() {
     private val _networkCallback by lazy { InternalNetworkCallback() }
     private val _networkReceiver by lazy { InternalNetworkReceiver() }
 
-    private var _isNetworkAvailable: Boolean = false
+    private var _isNetworkAvailable: Boolean? = null
         set(value) {
             if (field != value) {
                 field = value
-                onNetworkChanged(value)
+                if (value != null) {
+                    onNetworkChanged(value)
+                }
             }
         }
-
-    val isNetworkAvailable: Boolean
-        get() = _isNetworkAvailable
 
     @Synchronized
     fun register(context: Context) {
@@ -49,7 +48,7 @@ abstract class FNetworkObserver() {
         } else {
             _networkReceiver.unregister(context)
         }
-        _isNetworkAvailable = false
+        _isNetworkAvailable = null
     }
 
     abstract fun onNetworkChanged(isNetworkAvailable: Boolean)
