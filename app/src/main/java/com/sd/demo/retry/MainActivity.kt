@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.retry.databinding.ActivityMainBinding
-import com.sd.lib.retry.FNetworkObserver
+import com.sd.lib.retry.utils.FNetworkObserver
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
