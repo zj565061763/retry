@@ -109,8 +109,10 @@ abstract class FRetry(
                 return
             }
 
-            if (!checkRetry()) {
-                check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
+            val checkRetry = checkRetry()
+            check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
+
+            if (!checkRetry) {
                 if (!_isRetryPaused) {
                     _isRetryPaused = true
                     _mainHandler.post { onPause() }
