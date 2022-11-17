@@ -47,9 +47,10 @@ abstract class FRetry(
             if (isStarted) return
             isStarted = true
             retryCount = 0
+            retryDelayed(0)
+        }.also {
+            onStart()
         }
-        retryDelayed(0)
-        onStart()
     }
 
     /**
