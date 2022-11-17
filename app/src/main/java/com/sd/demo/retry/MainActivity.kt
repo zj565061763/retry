@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         when (v) {
             _binding.btnStart -> _retry.start()
-            _binding.btnStop -> _retry.cancel()
+            _binding.btnCancel -> _retry.cancel()
         }
     }
 
