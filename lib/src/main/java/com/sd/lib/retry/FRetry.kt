@@ -75,19 +75,22 @@ abstract class FRetry(
     }
 
     /**
+     * 恢复重试
+     */
+    @Synchronized
+    protected fun resumeRetry() {
+        if (state == State.Paused) {
+            state = State.Running
+            retryDelayed(0)
+        }
+    }
+
+    /**
      * 延迟[delayMillis]毫秒重试
      */
     private fun retryDelayed(delayMillis: Long) {
         _mainHandler.removeCallbacks(_retryRunnable)
         _mainHandler.postDelayed(_retryRunnable, delayMillis)
-    }
-
-    @Synchronized
-    internal fun resumeRetry() {
-        if (state == State.Paused) {
-            state = State.Running
-            retryDelayed(0)
-        }
     }
 
     private fun retryOnUiThread() {
