@@ -86,13 +86,12 @@ abstract class FRetry(
         _mainHandler.postDelayed(_retryRunnable, delayMillis)
     }
 
+    @Synchronized
     internal fun resumeRetry() {
-        synchronized(this@FRetry) {
-            if (_isRetryPaused) {
-                _isRetryPaused = false
-                if (isStarted && _loadSession == null) {
-                    retryDelayed(0)
-                }
+        if (_isRetryPaused) {
+            _isRetryPaused = false
+            if (isStarted && _loadSession == null) {
+                retryDelayed(0)
             }
         }
     }
