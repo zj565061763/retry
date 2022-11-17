@@ -42,31 +42,38 @@ abstract class FRetry(
     /**
      * 开始重试
      */
+    @Synchronized
     fun start() {
-        synchronized(this@FRetry) {
-            if (isStarted) return
-            isStarted = true
-            retryCount = 0
-            retryDelayed(0)
-        }.also {
-            onStart()
-        }
+        if (isStarted) return
+        isStarted = true
+
+        retryCount = 0
+        _mainHandler.post { onStart() }
+        retryDelayed(0)
     }
 
     /**
      * 停止重试
      */
-    fun cancel(): Boolean {
-        synchronized(this@FRetry) {
-            if (!isStarted) return false
-            isStarted = false
-            _mainHandler.removeCallbacks(_retryRunnable)
-            _loadSession?.let { it.isFinish = true }
-            _loadSession = null
-            _isRetryPaused = false
+    fun cancel() {
+        cancelInternal(false)
+    }
+
+    @Synchronized
+    private fun cancelInternal(checkRetryCount: Boolean = false) {
+        if (!isStarted) return
+        isStarted = false
+
+        _mainHandler.removeCallbacks(_retryRunnable)
+        _loadSession?.let { it.isFinish = true }
+        _loadSession = null
+        _isRetryPaused = false
+
+        _mainHandler.post { onStop() }
+
+        if (checkRetryCount && retryCount >= maxRetryCount) {
+            _mainHandler.post { onRetryMaxCount() }
         }
-        onStop()
-        return true
     }
 
     /**
@@ -98,9 +105,7 @@ abstract class FRetry(
         }
 
         if (isRetryMaxCount) {
-            if (cancel()) {
-                onRetryMaxCount()
-            }
+            cancelInternal(true)
             return
         }
 
