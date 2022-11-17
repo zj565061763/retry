@@ -21,13 +21,7 @@ abstract class FRetry(
     @Volatile
     private var _retryInterval: Long = 3_000L
 
-    @Volatile
     private var _loadSession: InternalLoadSession? = null
-
-    /** 某一次重试是否在加载中 */
-    private val isLoading: Boolean
-        get() = _loadSession != null
-
     private var _isRetryPaused = false
 
     private val _mainHandler = Handler(Looper.getMainLooper())
@@ -96,7 +90,7 @@ abstract class FRetry(
 
         val isRetryMaxCount = synchronized(this@FRetry) {
             if (!isStarted) return
-            if (isLoading) error("Current LoadSession is not finished.")
+            check(_loadSession == null) { "Current LoadSession is not finished." }
             retryCount >= maxRetryCount
         }
 
