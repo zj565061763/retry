@@ -116,7 +116,10 @@ abstract class FNetworkObserver() {
     companion object {
         @JvmStatic
         @JvmOverloads
-        fun isNetworkAvailable(context: Context, useNewApiLevel: Int = Build.VERSION_CODES.M): Boolean {
+        fun isNetworkAvailable(
+            context: Context,
+            useNewApiLevel: Int = Build.VERSION_CODES.M,
+        ): Boolean {
             require(useNewApiLevel >= Build.VERSION_CODES.M)
             val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= useNewApiLevel) {
