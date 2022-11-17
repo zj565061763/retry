@@ -179,18 +179,19 @@ abstract class FRetry(
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
+
+                cancel()
             }
-            cancel()
         }
 
         override fun onLoadError() {
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
-            }
 
-            val delay = if (retryCount >= maxRetryCount) 0 else _retryInterval
-            retryDelayed(delay)
+                val delay = if (retryCount >= maxRetryCount) 0 else _retryInterval
+                retryDelayed(delay)
+            }
         }
     }
 
