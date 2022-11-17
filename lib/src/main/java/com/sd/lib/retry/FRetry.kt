@@ -135,16 +135,22 @@ abstract class FRetry(
 
     /**
      * 开始回调（UI线程）
+     *
+     * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
      */
     protected open fun onStart() {}
 
     /**
      * 暂停回调（UI线程）
+     *
+     * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做通知事件
      */
     protected open fun onPause() {}
 
     /**
      * 结束回调（UI线程）
+     *
+     * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做通知事件
      */
     protected open fun onStop() {}
 
