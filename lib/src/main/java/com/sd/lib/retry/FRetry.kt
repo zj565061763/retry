@@ -99,15 +99,14 @@ abstract class FRetry(
         }
 
         if (!checkRetry()) {
-            val pause = synchronized(this@FRetry) {
+            synchronized(this@FRetry) {
                 check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
                 if (!_isRetryPaused) {
                     _isRetryPaused = true
                     true
                 } else false
-            }
-            if (pause) {
-                onPause()
+            }.let {
+                if (it) onPause()
             }
             return
         }
