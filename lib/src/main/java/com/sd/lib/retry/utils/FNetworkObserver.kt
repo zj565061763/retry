@@ -8,6 +8,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -48,10 +50,16 @@ abstract class FNetworkObserver() {
     }
 
     private fun notifyCallback(isAvailable: Boolean?) {
-        when (isAvailable) {
-            true -> onAvailable()
-            false -> onLost()
-            else -> {}
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            when (isAvailable) {
+                true -> onAvailable()
+                false -> onLost()
+                else -> {}
+            }
+        } else {
+            Handler(Looper.getMainLooper()).post {
+                notifyCallback(isAvailable)
+            }
         }
     }
 
