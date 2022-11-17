@@ -126,8 +126,9 @@ abstract class FRetry(
     }
 
     /**
-     * 检查是否可以发起重试（UI线程），此方法被调用时已经synchronized了当前对象，
-     * 返回false会触发[onPause]回调
+     * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
+     *
+     * 注意：此回调里不允许调用[cancel]方法停止重试
      */
     protected open fun checkRetry(): Boolean {
         return true
