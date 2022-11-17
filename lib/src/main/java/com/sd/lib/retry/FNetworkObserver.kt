@@ -11,13 +11,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import java.util.concurrent.atomic.AtomicBoolean
 
-abstract class NetworkObserver(context: Context) {
-    private val _context = context.applicationContext
+abstract class FNetworkObserver() {
+    private var _context: Context? = null
 
     private val _networkCallback by lazy { InternalNetworkCallback() }
     private val _networkReceiver by lazy { InternalNetworkReceiver() }
 
-    private var _isNetworkAvailable: Boolean = isNetworkAvailable(context)
+    private var _isNetworkAvailable: Boolean = false
         set(value) {
             if (field != value) {
                 field = value
@@ -28,20 +28,28 @@ abstract class NetworkObserver(context: Context) {
     val isNetworkAvailable: Boolean
         get() = _isNetworkAvailable
 
-    fun register() {
+    @Synchronized
+    fun register(context: Context) {
+        _context = context.applicationContext.also {
+            _isNetworkAvailable = isNetworkAvailable(it)
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            _networkCallback.register()
+            _networkCallback.register(context)
         } else {
-            _networkReceiver.register()
+            _networkReceiver.register(context)
         }
     }
 
+    @Synchronized
     fun unregister() {
+        val context = _context ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            _networkCallback.unregister()
+            _networkCallback.unregister(context)
         } else {
-            _networkReceiver.unregister()
+            _networkReceiver.unregister(context)
         }
+        _isNetworkAvailable = false
     }
 
     abstract fun onNetworkChanged(isNetworkAvailable: Boolean)
@@ -61,16 +69,16 @@ abstract class NetworkObserver(context: Context) {
         }
 
         @RequiresApi(Build.VERSION_CODES.N)
-        fun register() {
+        fun register(context: Context) {
             if (_hasRegister.compareAndSet(false, true)) {
-                val manager = _context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 manager.registerDefaultNetworkCallback(this)
             }
         }
 
-        fun unregister() {
+        fun unregister(context: Context) {
             if (_hasRegister.compareAndSet(true, false)) {
-                val manager = _context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 manager.unregisterNetworkCallback(this)
             }
         }
@@ -90,17 +98,17 @@ abstract class NetworkObserver(context: Context) {
             }
         }
 
-        fun register() {
+        fun register(context: Context) {
             if (_hasRegister.compareAndSet(false, true)) {
-                _context.registerReceiver(this, IntentFilter().apply {
+                context.registerReceiver(this, IntentFilter().apply {
                     addAction(ConnectivityManager.CONNECTIVITY_ACTION)
                 })
             }
         }
 
-        fun unregister() {
+        fun unregister(context: Context) {
             if (_hasRegister.compareAndSet(true, false)) {
-                _context.unregisterReceiver(this)
+                context.unregisterReceiver(this)
             }
         }
     }

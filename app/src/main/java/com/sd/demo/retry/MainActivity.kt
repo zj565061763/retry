@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.retry.databinding.ActivityMainBinding
+import com.sd.lib.retry.FNetworkObserver
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
+        _networkObserver.register(this)
     }
 
     override fun onClick(v: View) {
@@ -22,9 +24,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private val _networkObserver = object : FNetworkObserver() {
+        override fun onNetworkChanged(isNetworkAvailable: Boolean) {
+            logMsg { "onNetworkChanged $isNetworkAvailable" }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _retry.cancel()
+        _networkObserver.unregister()
     }
 }
 
