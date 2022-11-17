@@ -89,10 +89,10 @@ abstract class NetworkObserver(context: Context) {
     }
 
     companion object {
-        private fun isNetworkAvailable(context: Context, newApiLevel: Int = Build.VERSION_CODES.M): Boolean {
-            require(newApiLevel >= Build.VERSION_CODES.M)
+        private fun isNetworkAvailable(context: Context, useNewApiLevel: Int = Build.VERSION_CODES.M): Boolean {
+            require(useNewApiLevel >= Build.VERSION_CODES.M)
             val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            if (Build.VERSION.SDK_INT >= newApiLevel) {
+            if (Build.VERSION.SDK_INT >= useNewApiLevel) {
                 val network = manager.activeNetwork ?: return false
                 val capabilities = manager.getNetworkCapabilities(network) ?: return false
                 return when {
