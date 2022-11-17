@@ -114,6 +114,7 @@ abstract class FRetry(
             return
         }
 
+        _isRetryPaused = false
         synchronized(this@FRetry) {
             if (isStarted) {
                 retryCount++
