@@ -63,8 +63,8 @@ abstract class FNetworkObserver() {
             _isNetworkAvailable = true
         }
 
-        override fun onUnavailable() {
-            super.onUnavailable()
+        override fun onLost(network: Network) {
+            super.onLost(network)
             _isNetworkAvailable = false
         }
 
