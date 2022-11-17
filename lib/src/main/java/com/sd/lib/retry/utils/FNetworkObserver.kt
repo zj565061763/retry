@@ -10,7 +10,6 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.RequiresApi
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class FNetworkObserver() {
@@ -83,11 +82,12 @@ abstract class FNetworkObserver() {
             _isNetworkAvailable = false
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         fun register(context: Context) {
-            if (_hasRegister.compareAndSet(false, true)) {
-                val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                manager.registerDefaultNetworkCallback(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (_hasRegister.compareAndSet(false, true)) {
+                    val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    manager.registerDefaultNetworkCallback(this)
+                }
             }
         }
 
