@@ -3,7 +3,7 @@ package com.sd.demo.retry
 import android.content.Context
 import com.sd.lib.retry.FNetRetry
 
-class MyRetry(context: Context) : FNetRetry(context, 10) {
+class MyRetry(context: Context) : FNetRetry(context, 15) {
     private var _count = 0
 
     init {
@@ -30,7 +30,7 @@ class MyRetry(context: Context) : FNetRetry(context, 10) {
         logMsg { "MyRetry onRetry $retryCount" }
 
         _count++
-        if (_count >= 5) {
+        if (_count >= 10) {
             session.onLoadFinish()
         } else {
             session.onLoadError()
