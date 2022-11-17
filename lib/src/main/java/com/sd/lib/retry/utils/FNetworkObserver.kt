@@ -109,7 +109,7 @@ abstract class FNetworkObserver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
-                _isNetworkAvailable = isNetworkAvailable(context, Int.MAX_VALUE)
+                _isNetworkAvailable = isNetworkAvailable(context)
             }
         }
 
@@ -130,14 +130,9 @@ abstract class FNetworkObserver() {
 
     companion object {
         @JvmStatic
-        @JvmOverloads
-        fun isNetworkAvailable(
-            context: Context,
-            useNewApiLevel: Int = Build.VERSION_CODES.M,
-        ): Boolean {
-            require(useNewApiLevel >= Build.VERSION_CODES.M)
+        fun isNetworkAvailable(context: Context): Boolean {
             val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            if (Build.VERSION.SDK_INT >= useNewApiLevel) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val network = manager.activeNetwork ?: return false
                 val capabilities = manager.getNetworkCapabilities(network) ?: return false
                 return when {
