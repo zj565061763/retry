@@ -3,7 +3,7 @@ package com.sd.demo.retry
 import android.content.Context
 import com.sd.lib.retry.FNetRetry
 
-class MyRetry(context: Context) : FNetRetry(context, 15) {
+class AppRetry(context: Context) : FNetRetry(context, 15) {
     private var _count = 0
 
     init {
@@ -12,22 +12,22 @@ class MyRetry(context: Context) : FNetRetry(context, 15) {
 
     override fun onStart() {
         super.onStart()
-        logMsg { "MyRetry onStart" }
+        logMsg { "AppRetry onStart" }
         _count = 0
     }
 
     override fun onPause() {
         super.onPause()
-        logMsg { "MyRetry onPause" }
+        logMsg { "AppRetry onPause" }
     }
 
     override fun onStop() {
         super.onStop()
-        logMsg { "MyRetry onStop" }
+        logMsg { "AppRetry onStop" }
     }
 
     override fun onRetry(session: LoadSession): Boolean {
-        logMsg { "MyRetry onRetry $retryCount" }
+        logMsg { "AppRetry onRetry $retryCount" }
 
         _count++
         if (_count >= 10) {
@@ -41,6 +41,6 @@ class MyRetry(context: Context) : FNetRetry(context, 15) {
 
     override fun onRetryMaxCount() {
         super.onRetryMaxCount()
-        logMsg { "MyRetry onRetryMaxCount" }
+        logMsg { "AppRetry onRetryMaxCount" }
     }
 }

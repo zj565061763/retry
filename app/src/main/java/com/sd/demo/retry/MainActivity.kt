@@ -8,7 +8,7 @@ import com.sd.demo.retry.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private val _retry by lazy { MyRetry(this) }
+    private val _retry by lazy { AppRetry(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
