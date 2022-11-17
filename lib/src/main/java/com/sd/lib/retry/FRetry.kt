@@ -105,8 +105,7 @@ abstract class FRetry(
 
         if (!checkRetry()) {
             synchronized(this@FRetry) {
-                check(isStarted) { "Cannot cancel retry in checkRetry() callback." }
-                if (!_isRetryPaused) {
+                if (!_isRetryPaused && isStarted) {
                     _isRetryPaused = true
                     true
                 } else false
