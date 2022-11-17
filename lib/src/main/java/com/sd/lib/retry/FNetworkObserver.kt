@@ -27,7 +27,6 @@ abstract class FNetworkObserver() {
             }
         }
 
-    @Synchronized
     fun register(context: Context) {
         _context = context.applicationContext.also {
             _isNetworkAvailable = isNetworkAvailable(it)
@@ -40,7 +39,6 @@ abstract class FNetworkObserver() {
         }
     }
 
-    @Synchronized
     fun unregister() {
         val context = _context ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
