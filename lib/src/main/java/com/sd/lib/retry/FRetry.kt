@@ -158,7 +158,7 @@ abstract class FRetry(
     protected open fun onStop() {}
 
     /**
-     * 重试回调（UI线程），返回false将结束重试
+     * 重试回调（UI线程），返回false将停止重试
      */
     abstract fun onRetry(session: LoadSession): Boolean
 
