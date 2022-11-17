@@ -134,12 +134,17 @@ abstract class FRetry(
     protected open fun onStart() {}
 
     /**
+     * 暂停回调，[checkRetry]返回false的时候触发
+     */
+    protected open fun onPause() {}
+
+    /**
      * 结束回调
      */
     protected open fun onStop() {}
 
     /**
-     * 执行重试任务（UI线程），返回false将结束重试。
+     * 执行重试任务（UI线程），返回false将结束重试
      */
     abstract fun onRetry(session: LoadSession): Boolean
 
