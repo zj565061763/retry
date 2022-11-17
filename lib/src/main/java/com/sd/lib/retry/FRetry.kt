@@ -80,7 +80,7 @@ abstract class FRetry(
         synchronized(this@FRetry) {
             if (_isRetryPaused) {
                 _isRetryPaused = false
-                if (isStarted) {
+                if (isStarted && _loadSession == null) {
                     retryDelayed(0)
                 }
             }
