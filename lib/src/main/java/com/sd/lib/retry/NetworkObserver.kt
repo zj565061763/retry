@@ -69,6 +69,10 @@ abstract class NetworkObserver(context: Context) {
     private inner class InternalNetworkReceiver : BroadcastReceiver() {
         private val _hasRegister = AtomicBoolean()
 
+        init {
+            require(Build.VERSION.SDK_INT < Build.VERSION_CODES.N) { "Please use the new api." }
+        }
+
         override fun onReceive(context: Context, intent: Intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
                 _isNetworkAvailable = isNetworkAvailable(context, Int.MAX_VALUE)
