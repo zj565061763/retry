@@ -26,28 +26,24 @@ public abstract class FNetRetry extends FRetry {
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver();
+        synchronized (FNetRetry.this) {
+            if (mNetworkReceiver == null) {
+                mNetworkReceiver = new NetworkReceiver(mContext);
+                mNetworkReceiver.register();
+                Log.i(getClass().getSimpleName(), "registerReceiver " + this);
+            }
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver();
-    }
-
-    private void registerReceiver() {
-        if (mNetworkReceiver == null) {
-            mNetworkReceiver = new NetworkReceiver(mContext);
-            mNetworkReceiver.register();
-            Log.i(getClass().getSimpleName(), "registerReceiver " + this);
-        }
-    }
-
-    private void unregisterReceiver() {
-        if (mNetworkReceiver != null) {
-            mNetworkReceiver.unregister();
-            mNetworkReceiver = null;
-            Log.i(getClass().getSimpleName(), "unregisterReceiver " + this);
+        synchronized (FNetRetry.this) {
+            if (mNetworkReceiver != null) {
+                mNetworkReceiver.unregister();
+                mNetworkReceiver = null;
+                Log.i(getClass().getSimpleName(), "unregisterReceiver " + this);
+            }
         }
     }
 
