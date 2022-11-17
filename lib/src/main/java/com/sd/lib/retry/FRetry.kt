@@ -60,7 +60,7 @@ abstract class FRetry(
             if (!isStarted) return false
             isStarted = false
             _mainHandler.removeCallbacks(_retryRunnable)
-            _loadSession?.let { it._isFinish = true }
+            _loadSession?.let { it.isFinish = true }
             _loadSession = null
             _isRetryPaused = false
         }
@@ -163,7 +163,7 @@ abstract class FRetry(
     protected open fun onRetryMaxCount() {}
 
     private inner class InternalLoadSession : LoadSession {
-        var _isFinish = false
+        var isFinish = false
             set(value) {
                 require(value) { "Require true value." }
                 field = value
@@ -174,16 +174,16 @@ abstract class FRetry(
 
         override fun onLoadFinish() {
             synchronized(this@FRetry) {
-                if (_isFinish) return
-                _isFinish = true
+                if (isFinish) return
+                isFinish = true
             }
             cancel()
         }
 
         override fun onLoadError() {
             synchronized(this@FRetry) {
-                if (_isFinish) return
-                _isFinish = true
+                if (isFinish) return
+                isFinish = true
             }
 
             val delay = if (retryCount >= maxRetryCount) 0 else _retryInterval
