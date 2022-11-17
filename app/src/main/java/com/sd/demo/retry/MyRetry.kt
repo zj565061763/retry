@@ -1,9 +1,9 @@
 package com.sd.demo.retry
 
 import android.content.Context
-import com.sd.lib.retry.FNetRetryHandler
+import com.sd.lib.retry.FNetRetry
 
-class MyRetry(context: Context) : FNetRetryHandler(context, 10) {
+class MyRetry(context: Context) : FNetRetry(context, 10) {
     private var _count = 0
 
     init {

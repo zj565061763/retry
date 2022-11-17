@@ -14,11 +14,11 @@ import androidx.annotation.NonNull;
 /**
  * 需要用到网络的重试帮助类
  */
-public abstract class FNetRetryHandler extends FRetry {
+public abstract class FNetRetry extends FRetry {
     private final Context mContext;
     private NetworkReceiver mNetworkReceiver;
 
-    public FNetRetryHandler(@NonNull Context context, int maxRetryCount) {
+    public FNetRetry(@NonNull Context context, int maxRetryCount) {
         super(maxRetryCount);
         mContext = context.getApplicationContext();
     }
