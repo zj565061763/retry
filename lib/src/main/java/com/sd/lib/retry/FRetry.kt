@@ -26,7 +26,7 @@ abstract class FRetry(
     private var _loadSession: InternalLoadSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
-    private val _retryRunnable = Runnable { tryInternal() }
+    private val _retryRunnable = Runnable { retryOnUiThread() }
 
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
@@ -96,7 +96,7 @@ abstract class FRetry(
         }
     }
 
-    private fun tryInternal() {
+    private fun retryOnUiThread() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
         var session: LoadSession? = null
