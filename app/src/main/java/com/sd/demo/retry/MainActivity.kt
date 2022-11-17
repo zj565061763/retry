@@ -30,15 +30,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        logMsg { "onResume isNetworkAvailable:${FNetworkObserver.isNetworkAvailable(this)}" }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         _retry.cancel()
         _networkObserver.unregister()
+        logMsg { "onDestroy isNetworkAvailable:${FNetworkObserver.isNetworkAvailable(this)}" }
     }
 }
 
