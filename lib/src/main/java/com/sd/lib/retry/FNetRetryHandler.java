@@ -8,12 +8,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 /**
  * 需要用到网络的重试帮助类
  */
-public abstract class FNetRetryHandler extends FRetryHandler {
+public abstract class FNetRetryHandler extends FRetry {
     private final Context mContext;
     private NetworkReceiver mNetworkReceiver;
 
@@ -23,13 +24,15 @@ public abstract class FNetRetryHandler extends FRetryHandler {
     }
 
     @Override
-    protected void onStateChanged(boolean started) {
-        super.onStateChanged(started);
-        if (started) {
-            registerReceiver();
-        } else {
-            unregisterReceiver();
-        }
+    protected void onStart() {
+        super.onStart();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver();
     }
 
     private void registerReceiver() {
@@ -64,21 +67,15 @@ public abstract class FNetRetryHandler extends FRetryHandler {
     /**
      * 网络可用回调
      */
+    @CallSuper
     protected void onNetworkConnected() {
-        synchronized (FNetRetryHandler.this) {
-            final boolean isLoading = isLoading();
-            Log.i(getClass().getSimpleName(), "onNetworkConnected isLoading:" + isLoading + " " + this);
-            if (!isLoading) {
-                retry(0);
-            }
-        }
+        resumeRetry$com_sd_lib_android_retry();
     }
 
     /**
      * 网络不可用回调
      */
     protected void onNetworkDisconnected() {
-        Log.i(getClass().getSimpleName(), "onNetworkDisconnected isLoading:" + isLoading() + " " + this);
     }
 
     private final class NetworkReceiver extends BroadcastReceiver {

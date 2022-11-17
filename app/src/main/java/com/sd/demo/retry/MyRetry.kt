@@ -10,14 +10,18 @@ class MyRetry(context: Context) : FNetRetryHandler(context, 10) {
         setRetryInterval(1000)
     }
 
-    override fun onStateChanged(started: Boolean) {
-        super.onStateChanged(started)
-        logMsg { "onStateChanged $started" }
+    override fun onStart() {
+        super.onStart()
+        logMsg { "MyRetry onStart" }
         _count = 0
     }
 
-    override fun onRetry(session: LoadSession) {
-        session.onLoading()
+    override fun onStop() {
+        super.onStop()
+        logMsg { "MyRetry onStop" }
+    }
+
+    override fun onRetry(session: LoadSession): Boolean {
         logMsg { "onRetry $retryCount" }
 
         _count++
@@ -26,6 +30,8 @@ class MyRetry(context: Context) : FNetRetryHandler(context, 10) {
         } else {
             session.onLoadError()
         }
+
+        return true
     }
 
     override fun onRetryMaxCount() {
