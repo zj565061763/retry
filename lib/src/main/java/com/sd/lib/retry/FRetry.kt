@@ -21,8 +21,9 @@ abstract class FRetry(
     @Volatile
     private var _retryInterval: Long = 3_000L
 
-    private var _loadSession: InternalLoadSession? = null
+    @Volatile
     private var _isRetryPaused = false
+    private var _loadSession: InternalLoadSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { tryInternal() }
