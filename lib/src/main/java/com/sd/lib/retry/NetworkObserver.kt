@@ -70,7 +70,7 @@ abstract class NetworkObserver(context: Context) {
         private val _hasRegister = AtomicBoolean()
 
         init {
-            require(Build.VERSION.SDK_INT < Build.VERSION_CODES.N) { "Please use the new api." }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) error("Please use the new api.")
         }
 
         override fun onReceive(context: Context, intent: Intent) {
