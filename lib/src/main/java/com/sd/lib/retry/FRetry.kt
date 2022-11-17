@@ -46,7 +46,6 @@ abstract class FRetry(
             if (isStarted) return
             isStarted = true
             retryCount = 0
-            _isRetryPaused = false
         }
         retryDelayed(0)
         onStart()
