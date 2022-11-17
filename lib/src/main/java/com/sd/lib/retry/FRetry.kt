@@ -56,7 +56,7 @@ abstract class FRetry(
      * 停止重试
      */
     fun cancel() {
-        cancelInternal(false)
+        cancelInternal()
     }
 
     @Synchronized
@@ -99,18 +99,15 @@ abstract class FRetry(
     private fun tryInternal() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
-        val isRetryMaxCount = synchronized(this@FRetry) {
+        synchronized(this@FRetry) {
             if (!isStarted) return
             check(_loadSession == null) { "Current LoadSession is not finished." }
-            retryCount >= maxRetryCount
-        }
 
-        if (isRetryMaxCount) {
-            cancelInternal(true)
-            return
-        }
+            if (retryCount >= maxRetryCount) {
+                cancelInternal(true)
+                return
+            }
 
-        synchronized(this@FRetry) {
             if (!checkRetry()) {
                 if (!_isRetryPaused && isStarted) {
                     _isRetryPaused = true
@@ -119,6 +116,8 @@ abstract class FRetry(
                 return
             }
             _isRetryPaused = false
+
+
         }
 
         synchronized(this@FRetry) {
