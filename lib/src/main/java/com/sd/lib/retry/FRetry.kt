@@ -58,11 +58,11 @@ abstract class FRetry(
     fun cancel() {
         synchronized(this@FRetry) {
             if (!isStarted) return
+            isStarted = false
             _mainHandler.removeCallbacks(_retryRunnable)
             _loadSession?.let { it._isFinish = true }
             _loadSession = null
             _isRetryPaused = false
-            isStarted = false
         }
         onStop()
     }
