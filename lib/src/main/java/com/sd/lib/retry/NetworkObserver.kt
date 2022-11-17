@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 abstract class NetworkObserver(context: Context) {
     private val _context = context.applicationContext
 
-    private val _networkReceiver by lazy { NetworkReceiver() }
     private val _networkCallback by lazy { InternalNetworkCallback() }
+    private val _networkReceiver by lazy { InternalNetworkReceiver() }
 
     private var _isNetworkAvailable: Boolean = isNetworkAvailable(context)
         set(value) {
@@ -45,6 +45,7 @@ abstract class NetworkObserver(context: Context) {
 
     abstract fun onNetworkChanged(isNetworkAvailable: Boolean)
 
+    // Callback
     private inner class InternalNetworkCallback : ConnectivityManager.NetworkCallback() {
         private val _hasRegister = AtomicBoolean()
 
@@ -64,12 +65,13 @@ abstract class NetworkObserver(context: Context) {
         }
     }
 
-    private inner class NetworkReceiver : BroadcastReceiver() {
+    // Receiver
+    private inner class InternalNetworkReceiver : BroadcastReceiver() {
         private val _hasRegister = AtomicBoolean()
 
         override fun onReceive(context: Context, intent: Intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
-                _isNetworkAvailable = isNetworkAvailable(context)
+                _isNetworkAvailable = isNetworkAvailable(context, Int.MAX_VALUE)
             }
         }
 
