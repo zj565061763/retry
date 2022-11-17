@@ -24,14 +24,11 @@ abstract class FNetRetry(maxRetryCount: Int, context: Context) : FRetry(maxRetry
     }
 
     private val _networkObserver = object : FNetworkObserver() {
-        override fun onNetworkAvailableChanged(isAvailable: Boolean) {
-            this@FNetRetry.onNetworkAvailableChanged(isAvailable)
-        }
-    }
-
-    protected open fun onNetworkAvailableChanged(isAvailable: Boolean) {
-        if (isAvailable) {
+        override fun onAvailable() {
             resumeRetry()
+        }
+
+        override fun onLost() {
         }
     }
 }

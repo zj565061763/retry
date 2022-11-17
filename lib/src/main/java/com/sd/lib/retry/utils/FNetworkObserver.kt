@@ -21,8 +21,10 @@ abstract class FNetworkObserver() {
         set(value) {
             if (field != value) {
                 field = value
-                if (value != null) {
-                    onNetworkAvailableChanged(value)
+                when (value) {
+                    true -> onAvailable()
+                    false -> onLost()
+                    else -> {}
                 }
             }
         }
@@ -49,7 +51,9 @@ abstract class FNetworkObserver() {
         _isNetworkAvailable = null
     }
 
-    abstract fun onNetworkAvailableChanged(isAvailable: Boolean)
+    abstract fun onAvailable()
+
+    abstract fun onLost()
 
     // Callback
     private inner class InternalNetworkCallback : ConnectivityManager.NetworkCallback() {

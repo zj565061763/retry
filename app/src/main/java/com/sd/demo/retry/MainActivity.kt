@@ -25,8 +25,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private val _networkObserver = object : FNetworkObserver() {
-        override fun onNetworkAvailableChanged(isAvailable: Boolean) {
-            logMsg { "onNetworkAvailableChanged $isAvailable" }
+        override fun onAvailable() {
+            logMsg { "Network onAvailable" }
+        }
+
+        override fun onLost() {
+            logMsg { "Network onLost" }
         }
     }
 
