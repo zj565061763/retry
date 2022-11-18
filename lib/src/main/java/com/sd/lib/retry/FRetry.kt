@@ -178,7 +178,7 @@ abstract class FRetry(
                 }
             }
 
-        override fun onFinish() {
+        override fun finish() {
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
@@ -187,7 +187,7 @@ abstract class FRetry(
             }
         }
 
-        override fun onError() {
+        override fun retry() {
             synchronized(this@FRetry) {
                 if (isFinish) return
                 isFinish = true
@@ -199,8 +199,15 @@ abstract class FRetry(
     }
 
     interface Session {
-        fun onFinish()
-        fun onError()
+        /**
+         * 停止重试
+         */
+        fun finish()
+
+        /**
+         * 重新发起一次重试
+         */
+        fun retry()
     }
 
     enum class State {
