@@ -10,10 +10,11 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import com.sd.lib.context.FContext
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class FNetworkObserver() {
-    private var _context: Context? = null
+    private val _context get() = FContext.get()
 
     private val _networkCallback by lazy { InternalNetworkCallback() }
     private val _networkReceiver by lazy { InternalNetworkReceiver() }
@@ -26,26 +27,23 @@ abstract class FNetworkObserver() {
             }
         }
 
-    fun register(context: Context) {
-        _context = context.applicationContext.also {
-            if (_isNetworkAvailable == null) {
-                _isNetworkAvailable = isNetworkAvailable(it)
-            }
+    fun register() {
+        if (_isNetworkAvailable == null) {
+            _isNetworkAvailable = isNetworkAvailable()
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            _networkCallback.register(context)
+            _networkCallback.register(_context)
         } else {
-            _networkReceiver.register(context)
+            _networkReceiver.register(_context)
         }
     }
 
     fun unregister() {
-        val context = _context ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            _networkCallback.unregister(context)
+            _networkCallback.unregister(_context)
         } else {
-            _networkReceiver.unregister(context)
+            _networkReceiver.unregister(_context)
         }
         _isNetworkAvailable = null
     }
@@ -109,7 +107,7 @@ abstract class FNetworkObserver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
-                _isNetworkAvailable = isNetworkAvailable(context)
+                _isNetworkAvailable = isNetworkAvailable()
             }
         }
 
@@ -130,8 +128,8 @@ abstract class FNetworkObserver() {
 
     companion object {
         @JvmStatic
-        fun isNetworkAvailable(context: Context): Boolean {
-            val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        fun isNetworkAvailable(): Boolean {
+            val manager = FContext.get().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val network = manager.activeNetwork ?: return false
                 val capabilities = manager.getNetworkCapabilities(network) ?: return false

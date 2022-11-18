@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-        _networkObserver.register(this)
+        _networkObserver.register()
     }
 
     override fun onClick(v: View) {
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onDestroy()
         _retry.cancel()
         _networkObserver.unregister()
-        logMsg { "onDestroy isNetworkAvailable:${FNetworkObserver.isNetworkAvailable(this)}" }
+        logMsg { "onDestroy isNetworkAvailable:${FNetworkObserver.isNetworkAvailable()}" }
     }
 }
 

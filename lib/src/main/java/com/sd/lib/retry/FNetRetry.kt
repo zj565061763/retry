@@ -1,13 +1,11 @@
 package com.sd.lib.retry
 
-import com.sd.lib.context.FContext
 import com.sd.lib.retry.utils.FNetworkObserver
 
 abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
-    private val _context get() = FContext.get()
 
     override fun checkRetry(): Boolean {
-        if (!FNetworkObserver.isNetworkAvailable(_context)) {
+        if (!FNetworkObserver.isNetworkAvailable()) {
             return false
         }
         return super.checkRetry()
@@ -15,7 +13,7 @@ abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
 
     override fun onStart() {
         super.onStart()
-        _networkObserver.register(_context)
+        _networkObserver.register()
     }
 
     override fun onStop() {
