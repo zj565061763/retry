@@ -1,9 +1,8 @@
 package com.sd.demo.retry
 
-import android.content.Context
 import com.sd.lib.retry.FNetRetry
 
-class AppRetry(context: Context, maxRetryCount: Int) : FNetRetry(context, maxRetryCount) {
+class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
     private var _count = 0
 
     init {

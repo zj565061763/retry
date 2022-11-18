@@ -1,10 +1,10 @@
 package com.sd.lib.retry
 
-import android.content.Context
+import com.sd.lib.context.FContext
 import com.sd.lib.retry.utils.FNetworkObserver
 
-abstract class FNetRetry(context: Context, maxRetryCount: Int) : FRetry(maxRetryCount) {
-    private val _context = context.applicationContext
+abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
+    private val _context get() = FContext.get()
 
     override fun checkRetry(): Boolean {
         if (!FNetworkObserver.isNetworkAvailable(_context)) {

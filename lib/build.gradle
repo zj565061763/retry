@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.github.zj565061763:context:latest.release'
 }
 
 task generateSourcesJar(type: Jar) {
