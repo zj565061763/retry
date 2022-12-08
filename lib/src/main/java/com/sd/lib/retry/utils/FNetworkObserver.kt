@@ -10,11 +10,12 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import com.sd.lib.context.FContext
+import com.sd.lib.ctx.FContext
+import com.sd.lib.ctx.fContext
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class FNetworkObserver() {
-    private val _context get() = FContext.get()
+    private val _context get() = fContext
 
     private val _networkCallback by lazy { InternalNetworkCallback() }
     private val _networkReceiver by lazy { InternalNetworkReceiver() }
