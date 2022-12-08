@@ -10,7 +10,6 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import com.sd.lib.ctx.FContext
 import com.sd.lib.ctx.fContext
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -130,7 +129,7 @@ abstract class FNetworkObserver() {
     companion object {
         @JvmStatic
         fun isNetworkAvailable(): Boolean {
-            val manager = FContext.get().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val manager = fContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 val network = manager.activeNetwork ?: return false
                 val capabilities = manager.getNetworkCapabilities(network) ?: return false
