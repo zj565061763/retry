@@ -99,7 +99,7 @@ abstract class FRetry(
         var session: Session? = null
         synchronized(this@FRetry) {
             if (state != State.Running) return
-            if (_currentSession != null) error("Current LoadSession is not finished.")
+            if (_currentSession != null) error("Current session is not finished.")
 
             if (retryCount >= maxRetryCount) {
                 cancelInternal(true)
