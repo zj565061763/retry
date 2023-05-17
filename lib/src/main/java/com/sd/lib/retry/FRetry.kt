@@ -79,8 +79,14 @@ abstract class FRetry(
      * 延迟[delayMillis]毫秒重试
      */
     private fun retryDelayed(delayMillis: Long) {
-        _mainHandler.removeCallbacks(_retryRunnable)
-        _mainHandler.postDelayed(_retryRunnable, delayMillis)
+        check(state == State.Running)
+        if (retryCount >= maxRetryCount) {
+            stopRetry()
+            _mainHandler.post { onRetryMaxCount() }
+        } else {
+            _mainHandler.removeCallbacks(_retryRunnable)
+            _mainHandler.postDelayed(_retryRunnable, delayMillis)
+        }
     }
 
     private fun retryOnUiThread() {
@@ -183,8 +189,9 @@ abstract class FRetry(
                 if (isFinish) return
                 isFinish = true
 
-                val delay = if (retryCount >= maxRetryCount) 0 else _retryInterval
-                retryDelayed(delay)
+                if (state == State.Running) {
+                    retryDelayed(_retryInterval)
+                }
             }
         }
     }
