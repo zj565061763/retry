@@ -13,7 +13,7 @@ import android.os.Looper
 import com.sd.lib.ctx.fContext
 import java.util.concurrent.atomic.AtomicBoolean
 
-abstract class FNetworkObserver() {
+abstract class FNetworkObserver {
     private val _context get() = fContext
 
     private val _networkCallback by lazy { InternalNetworkCallback() }
