@@ -2,26 +2,38 @@ package com.sd.demo.retry
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.retry.databinding.ActivityMainBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.sd.demo.retry.ui.theme.AppTheme
 import com.sd.lib.retry.utils.FNetworkObserver
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
-    private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
+class MainActivity : ComponentActivity() {
     private val _retry = AppRetry(15)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(_binding.root)
         _networkObserver.register()
-    }
-
-    override fun onClick(v: View) {
-        when (v) {
-            _binding.btnStart -> _retry.start()
-            _binding.btnCancel -> _retry.cancel()
+        setContent {
+            AppTheme {
+                Content(
+                    onClickStart = {
+                        _retry.start()
+                    },
+                    onClickCancel = {
+                        _retry.cancel()
+                    }
+                )
+            }
         }
     }
 
@@ -37,9 +49,42 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        _retry.cancel()
         _networkObserver.unregister()
-        logMsg { "onDestroy isNetworkAvailable:${FNetworkObserver.isNetworkAvailable()}" }
+    }
+}
+
+@Composable
+private fun Content(
+    onClickStart: () -> Unit,
+    onClickCancel: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        Button(
+            onClick = onClickStart
+        ) {
+            Text(text = "start")
+        }
+
+        Button(
+            onClick = onClickCancel
+        ) {
+            Text(text = "cancel")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultPreview() {
+    AppTheme {
+        Content(
+            onClickStart = {},
+            onClickCancel = {},
+        )
     }
 }
 
