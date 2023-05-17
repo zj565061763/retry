@@ -3,7 +3,6 @@ package com.sd.demo.retry
 import com.sd.lib.retry.FNetRetry
 
 class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
-    private var _count = 0
 
     init {
         setRetryInterval(1000)
@@ -12,7 +11,6 @@ class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
     override fun onStart() {
         super.onStart()
         logMsg { "AppRetry onStart" }
-        _count = 0
     }
 
     override fun onPause() {
@@ -28,8 +26,7 @@ class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
     override fun onRetry(session: Session): Boolean {
         logMsg { "AppRetry onRetry $retryCount" }
 
-        _count++
-        if (_count >= 10) {
+        if (retryCount >= 10) {
             session.finish()
         } else {
             session.retry()
