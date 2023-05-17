@@ -49,12 +49,9 @@ abstract class FNetworkObserver() {
     }
 
     private fun notifyCallback(isAvailable: Boolean?) {
+        if (isAvailable == null) return
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            when (isAvailable) {
-                true -> onAvailable()
-                false -> onLost()
-                else -> {}
-            }
+            if (isAvailable) onAvailable() else onLost()
         } else {
             Handler(Looper.getMainLooper()).post {
                 notifyCallback(isAvailable)
