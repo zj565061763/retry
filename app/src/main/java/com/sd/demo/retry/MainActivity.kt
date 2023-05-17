@@ -29,8 +29,8 @@ class MainActivity : ComponentActivity() {
                     onClickStart = {
                         _retry.startRetry()
                     },
-                    onClickCancel = {
-                        _retry.cancelRetry()
+                    onClickStop = {
+                        _retry.stopRetry()
                     }
                 )
             }
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun Content(
     onClickStart: () -> Unit,
-    onClickCancel: () -> Unit,
+    onClickStop: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -70,9 +70,9 @@ private fun Content(
         }
 
         Button(
-            onClick = onClickCancel
+            onClick = onClickStop
         ) {
-            Text(text = "cancel")
+            Text(text = "stop")
         }
     }
 }
@@ -83,7 +83,7 @@ private fun DefaultPreview() {
     AppTheme {
         Content(
             onClickStart = {},
-            onClickCancel = {},
+            onClickStop = {},
         )
     }
 }

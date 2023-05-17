@@ -53,7 +53,7 @@ abstract class FRetry(
      * 停止重试
      */
     @Synchronized
-    fun cancelRetry() {
+    fun stopRetry() {
         if (state == State.Idle) return
         state = State.Idle
 
@@ -92,7 +92,7 @@ abstract class FRetry(
             if (_currentSession != null) error("Current session is not finished.")
 
             if (retryCount >= maxRetryCount) {
-                cancelRetry()
+                stopRetry()
                 _mainHandler.post { onRetryMaxCount() }
                 return
             }
@@ -114,7 +114,7 @@ abstract class FRetry(
 
         session?.let {
             if (!onRetry(it)) {
-                cancelRetry()
+                stopRetry()
             }
         }
     }
@@ -122,7 +122,7 @@ abstract class FRetry(
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
-     * 注意：此回调里不允许调用[cancelRetry]方法停止重试
+     * 注意：此回调里不允许调用[stopRetry]方法停止重试
      */
     protected open fun checkRetry(): Boolean {
         return true
@@ -174,7 +174,7 @@ abstract class FRetry(
                 if (isFinish) return
                 isFinish = true
 
-                cancelRetry()
+                stopRetry()
             }
         }
 
