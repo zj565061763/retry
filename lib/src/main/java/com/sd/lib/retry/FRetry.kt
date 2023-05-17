@@ -40,7 +40,7 @@ abstract class FRetry(
      * 开始重试
      */
     @Synchronized
-    fun start() {
+    fun startRetry() {
         if (state != State.Idle) return
         state = State.Running
 
@@ -52,7 +52,7 @@ abstract class FRetry(
     /**
      * 停止重试
      */
-    fun cancel() {
+    fun cancelRetry() {
         cancelInternal()
     }
 
@@ -123,7 +123,7 @@ abstract class FRetry(
 
         session?.let {
             if (!onRetry(it)) {
-                cancel()
+                cancelRetry()
             }
         }
     }
@@ -131,7 +131,7 @@ abstract class FRetry(
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
-     * 注意：此回调里不允许调用[cancel]方法停止重试
+     * 注意：此回调里不允许调用[cancelRetry]方法停止重试
      */
     protected open fun checkRetry(): Boolean {
         return true
@@ -183,7 +183,7 @@ abstract class FRetry(
                 if (isFinish) return
                 isFinish = true
 
-                cancel()
+                cancelRetry()
             }
         }
 

@@ -27,10 +27,10 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 Content(
                     onClickStart = {
-                        _retry.start()
+                        _retry.startRetry()
                     },
                     onClickCancel = {
-                        _retry.cancel()
+                        _retry.cancelRetry()
                     }
                 )
             }
