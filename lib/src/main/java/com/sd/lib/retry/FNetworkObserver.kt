@@ -20,17 +20,9 @@ abstract class FNetworkObserver {
     private val _networkReceiver by lazy { InternalNetworkReceiver() }
 
     private var _isNetworkAvailable: Boolean? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                notifyCallback(value)
-            }
-        }
 
     fun register() {
-        if (_isNetworkAvailable == null) {
-            _isNetworkAvailable = isNetworkAvailable()
-        }
+        notifyNetworkAvailable(isNetworkAvailable())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             _networkCallback.register(_context)
@@ -45,16 +37,19 @@ abstract class FNetworkObserver {
         } else {
             _networkReceiver.unregister(_context)
         }
-        _isNetworkAvailable = null
+
+        notifyNetworkAvailable(null)
     }
 
-    private fun notifyCallback(isAvailable: Boolean?) {
-        if (isAvailable == null) return
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            if (isAvailable) onAvailable() else onLost()
-        } else {
-            Handler(Looper.getMainLooper()).post {
-                notifyCallback(isAvailable)
+    private fun notifyNetworkAvailable(isAvailable: Boolean?) {
+        synchronized(this@FNetworkObserver) {
+            if (_isNetworkAvailable != isAvailable) {
+                _isNetworkAvailable = isAvailable
+                if (isAvailable != null) {
+                    Handler(Looper.getMainLooper()).post {
+                        if (isAvailable) onAvailable() else onLost()
+                    }
+                }
             }
         }
     }
@@ -69,12 +64,12 @@ abstract class FNetworkObserver {
 
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            _isNetworkAvailable = true
+            notifyNetworkAvailable(true)
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            _isNetworkAvailable = false
+            notifyNetworkAvailable(false)
         }
 
         fun register(context: Context) {
@@ -104,7 +99,7 @@ abstract class FNetworkObserver {
 
         override fun onReceive(context: Context, intent: Intent) {
             if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
-                _isNetworkAvailable = isNetworkAvailable()
+                notifyNetworkAvailable(isNetworkAvailable())
             }
         }
 
