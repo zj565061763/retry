@@ -95,13 +95,8 @@ abstract class FRetry(
         var session: Session? = null
         synchronized(this@FRetry) {
             if (state != State.Running) return
+            if (retryCount >= maxRetryCount) return
             if (_currentSession != null) error("Current session is not finished.")
-
-            if (retryCount >= maxRetryCount) {
-                stopRetry()
-                _mainHandler.post { onRetryMaxCount() }
-                return
-            }
 
             val checkRetry = checkRetry()
             check(state == State.Running) { "Cannot stop retry in checkRetry() callback." }
