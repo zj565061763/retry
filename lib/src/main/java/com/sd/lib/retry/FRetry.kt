@@ -18,8 +18,7 @@ abstract class FRetry(
         private set
 
     /** 重试间隔 */
-    @Volatile
-    private var _retryInterval: Long = 3_000L
+    private var _retryInterval: Long = 3000L
     private var _currentSession: InternalSession? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
@@ -32,6 +31,7 @@ abstract class FRetry(
     /**
      * 设置重试间隔，默认3000毫秒
      */
+    @Synchronized
     fun setRetryInterval(interval: Long) {
         _retryInterval = interval.coerceAtLeast(0)
     }
