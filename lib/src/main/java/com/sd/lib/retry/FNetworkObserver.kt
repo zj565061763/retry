@@ -1,4 +1,4 @@
-package com.sd.lib.retry.utils
+package com.sd.lib.retry
 
 import android.content.BroadcastReceiver
 import android.content.Context
