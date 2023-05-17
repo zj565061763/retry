@@ -52,12 +52,8 @@ abstract class FRetry(
     /**
      * 停止重试
      */
-    fun cancelRetry() {
-        cancelInternal()
-    }
-
     @Synchronized
-    private fun cancelInternal(checkRetryCount: Boolean = false) {
+    fun cancelRetry() {
         if (state == State.Idle) return
         state = State.Idle
 
@@ -65,13 +61,7 @@ abstract class FRetry(
         _currentSession?.let { it.isFinish = true }
         _currentSession = null
 
-        val notifyRetryMax = checkRetryCount && retryCount >= maxRetryCount
-        _mainHandler.post {
-            onStop()
-            if (notifyRetryMax) {
-                onRetryMaxCount()
-            }
-        }
+        _mainHandler.post { onStop() }
     }
 
     /**
@@ -102,7 +92,8 @@ abstract class FRetry(
             if (_currentSession != null) error("Current session is not finished.")
 
             if (retryCount >= maxRetryCount) {
-                cancelInternal(true)
+                cancelRetry()
+                _mainHandler.post { onRetryMaxCount() }
                 return
             }
 
