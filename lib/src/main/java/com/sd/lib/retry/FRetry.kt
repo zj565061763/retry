@@ -54,14 +54,13 @@ abstract class FRetry(
      */
     @Synchronized
     fun stopRetry() {
-        if (state == State.Idle) return
-        state = State.Idle
-
-        _mainHandler.removeCallbacks(_retryRunnable)
-        _currentSession?.let { it.isFinish = true }
-        _currentSession = null
-
-        _mainHandler.post { onStop() }
+        if (state != State.Idle) {
+            state = State.Idle
+            _mainHandler.removeCallbacks(_retryRunnable)
+            _currentSession?.let { it.isFinish = true }
+            _currentSession = null
+            _mainHandler.post { onStop() }
+        }
     }
 
     /**
