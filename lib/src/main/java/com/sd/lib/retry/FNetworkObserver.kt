@@ -22,7 +22,11 @@ abstract class FNetworkObserver {
     private var _isNetworkAvailable: Boolean? = null
 
     fun register() {
-        notifyNetworkAvailable(isNetworkAvailable())
+        synchronized(this@FNetworkObserver) {
+            if (_isNetworkAvailable == null) {
+                notifyNetworkAvailable(isNetworkAvailable())
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             _networkCallback.register(_context)
