@@ -1,0 +1,95 @@
+package com.sd.demo.retry
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.sd.demo.retry.ui.theme.AppTheme
+import com.sd.lib.retry.fNetRetry
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+
+class RetryExtActivity : ComponentActivity() {
+    private val _scope = MainScope()
+    private var _retryJob: Job? = null
+    private var _count = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            AppTheme {
+                Content(
+                    onClickStart = {
+                        stopRetry()
+                        _scope.launch {
+                            val result = fNetRetry {
+                                _count++
+                                logMsg { "retry $_count" }
+                                if (_count >= 5) {
+                                    Result.success("success")
+                                } else {
+                                    Result.failure(Exception("failure"))
+                                }
+                            }
+                            result.onSuccess {
+                                logMsg { "retry onSuccess $it" }
+                            }
+                            result.onFailure {
+                                logMsg { "retry onFailure $it" }
+                            }
+                        }.also {
+                            _retryJob = it
+                        }
+                    },
+                    onClickStop = {
+                        stopRetry()
+                    }
+                )
+            }
+        }
+    }
+
+    private fun stopRetry() {
+        _retryJob?.cancel()
+        _count = 0
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _scope.cancel()
+    }
+}
+
+@Composable
+private fun Content(
+    onClickStart: () -> Unit,
+    onClickStop: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        Button(
+            onClick = onClickStart
+        ) {
+            Text(text = "start")
+        }
+
+        Button(
+            onClick = onClickStop
+        ) {
+            Text(text = "stop")
+        }
+    }
+}

@@ -65,7 +65,7 @@ private fun Content() {
 
         Button(
             onClick = {
-
+                activity.startActivity(Intent(activity, RetryExtActivity::class.java))
             }
         ) {
             Text(text = "RetryExt")
