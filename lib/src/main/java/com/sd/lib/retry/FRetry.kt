@@ -113,10 +113,14 @@ abstract class FRetry(
         }
 
         session?.let {
-            if (!onRetry(it)) {
+            if (!retry(it)) {
                 stopRetry()
             }
         }
+    }
+
+    private fun retry(session: Session): Boolean {
+        return onRetry(session)
     }
 
     /**
