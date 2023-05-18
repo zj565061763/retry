@@ -8,7 +8,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 suspend fun <T> fNetRetry(
-    maxRetryCount: Int = 10,
+    maxRetryCount: Int = Int.MAX_VALUE,
     retryInterval: Long = 3000,
     factory: () -> FNetRetry = {
         object : FNetRetry(maxRetryCount) {
@@ -28,7 +28,7 @@ suspend fun <T> fNetRetry(
 }
 
 suspend fun <T> fRetry(
-    maxRetryCount: Int = 10,
+    maxRetryCount: Int = Int.MAX_VALUE,
     retryInterval: Long = 3000,
     factory: () -> FRetry = {
         object : FRetry(maxRetryCount) {
