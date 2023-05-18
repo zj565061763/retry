@@ -2,6 +2,7 @@ package com.sd.lib.retry
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -59,7 +60,7 @@ suspend fun <T> fRetry(
                         session.retry()
                     }
                 }
-                return true
+                return scope.isActive
             }
 
             override fun onRetryMaxCount() {
