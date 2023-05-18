@@ -20,12 +20,20 @@ abstract class FRetry(
     /** 重试间隔 */
     private var _retryInterval: Long = 3000L
     private var _currentSession: InternalSession? = null
+    private var _callback: Callback? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { retryOnUiThread() }
 
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
+    }
+
+    /**
+     * 设置回调对象
+     */
+    fun setCallback(callback: Callback?) {
+        _callback = callback
     }
 
     /**
@@ -120,7 +128,7 @@ abstract class FRetry(
     }
 
     private fun retry(session: Session): Boolean {
-        return onRetry(session)
+        return _callback?.onRetry(session) ?: onRetry(session)
     }
 
     /**
@@ -161,7 +169,9 @@ abstract class FRetry(
     /**
      * 达到最大重试次数回调（UI线程）
      */
-    protected open fun onRetryMaxCount() {}
+    protected open fun onRetryMaxCount() {
+        _callback?.onRetryMaxCount()
+    }
 
     private inner class InternalSession : Session {
         var isFinish = false
@@ -210,5 +220,17 @@ abstract class FRetry(
         Idle,
         Running,
         Paused
+    }
+
+    abstract class Callback {
+        /**
+         * 重试回调（UI线程），返回false将停止重试
+         */
+        abstract fun onRetry(session: Session): Boolean
+
+        /**
+         * 达到最大重试次数回调（UI线程）
+         */
+        open fun onRetryMaxCount() {}
     }
 }

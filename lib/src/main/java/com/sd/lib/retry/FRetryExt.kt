@@ -9,14 +9,44 @@ import kotlin.coroutines.resume
 suspend fun <T> fNetRetry(
     maxRetryCount: Int = 10,
     retryInterval: Long = 3000,
+    factory: () -> FNetRetry = {
+        object : FNetRetry(maxRetryCount) {
+            override fun onRetry(session: Session): Boolean {
+                error("Callback is null")
+            }
+        }
+    },
+    block: suspend () -> Result<T>
+): Result<T> {
+    return fRetry(
+        maxRetryCount = maxRetryCount,
+        retryInterval = retryInterval,
+        factory = { factory() },
+        block = block,
+    )
+}
+
+suspend fun <T> fRetry(
+    maxRetryCount: Int = 10,
+    retryInterval: Long = 3000,
+    factory: () -> FRetry = {
+        object : FRetry(maxRetryCount) {
+            override fun onRetry(session: Session): Boolean {
+                error("Callback is null")
+            }
+        }
+    },
     block: suspend () -> Result<T>
 ): Result<T> {
     return suspendCancellableCoroutine { cont ->
         val scope = MainScope()
-        val retry = object : FNetRetry(maxRetryCount) {
+        val retry = factory().apply {
+            setRetryInterval(retryInterval)
+        }
+        retry.setCallback(object : FRetry.Callback() {
             private var _lastResult: Result<T>? = null
 
-            override fun onRetry(session: Session): Boolean {
+            override fun onRetry(session: FRetry.Session): Boolean {
                 scope.launch {
                     val result = block().also {
                         _lastResult = it
@@ -36,9 +66,7 @@ suspend fun <T> fNetRetry(
                 super.onRetryMaxCount()
                 cont.resume(_lastResult!!)
             }
-        }.apply {
-            setRetryInterval(retryInterval)
-        }
+        })
 
         cont.invokeOnCancellation {
             scope.cancel()
