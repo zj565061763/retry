@@ -41,12 +41,12 @@ abstract class FRetry(
      */
     @Synchronized
     fun startRetry() {
-        if (state != State.Idle) return
-        state = State.Running
-
-        retryCount = 0
-        _mainHandler.post { onStart() }
-        retryDelayed(0)
+        if (state == State.Idle) {
+            state = State.Running
+            retryCount = 0
+            _mainHandler.post { onStart() }
+            retryDelayed(0)
+        }
     }
 
     /**
