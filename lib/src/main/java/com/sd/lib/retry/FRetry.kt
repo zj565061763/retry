@@ -67,7 +67,7 @@ abstract class FRetry(
             _mainHandler.removeCallbacks(_retryRunnable)
             _currentSession?.let { it.isFinish = true }
             _currentSession = null
-            _mainHandler.post { onStop() }
+            notifyStop()
         }
     }
 
@@ -145,6 +145,13 @@ abstract class FRetry(
         }
     }
 
+    private fun notifyStop() {
+        _mainHandler.post {
+            _callback?.onStop()
+            onStop()
+        }
+    }
+
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
@@ -173,9 +180,7 @@ abstract class FRetry(
      *
      * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做通知事件
      */
-    protected open fun onStop() {
-        _callback?.onStop()
-    }
+    protected open fun onStop() {}
 
     /**
      * 重试回调（UI线程），返回false将停止重试
