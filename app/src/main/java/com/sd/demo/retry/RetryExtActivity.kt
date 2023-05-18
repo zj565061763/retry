@@ -30,32 +30,36 @@ class RetryExtActivity : ComponentActivity() {
             AppTheme {
                 Content(
                     onClickStart = {
-                        stopRetry()
-                        _scope.launch {
-                            val result = fNetRetry {
-                                _count++
-                                logMsg { "retry $_count" }
-                                if (_count >= 5) {
-                                    Result.success("success")
-                                } else {
-                                    Result.failure(Exception("failure"))
-                                }
-                            }
-                            result.onSuccess {
-                                logMsg { "retry onSuccess $it" }
-                            }
-                            result.onFailure {
-                                logMsg { "retry onFailure $it" }
-                            }
-                        }.also {
-                            _retryJob = it
-                        }
+                        startRetry()
                     },
                     onClickStop = {
                         stopRetry()
                     }
                 )
             }
+        }
+    }
+
+    private fun startRetry() {
+        stopRetry()
+        _scope.launch {
+            val result = fNetRetry {
+                _count++
+                logMsg { "retry $_count" }
+                if (_count >= 5) {
+                    Result.success("success")
+                } else {
+                    Result.failure(Exception("failure"))
+                }
+            }
+            result.onSuccess {
+                logMsg { "retry onSuccess $it" }
+            }
+            result.onFailure {
+                logMsg { "retry onFailure $it" }
+            }
+        }.also {
+            _retryJob = it
         }
     }
 
