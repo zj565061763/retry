@@ -1,5 +1,7 @@
 package com.sd.demo.retry
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -12,27 +14,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.sd.demo.retry.ui.theme.AppTheme
 import com.sd.lib.retry.FNetworkObserver
 
 class MainActivity : ComponentActivity() {
-    private val _retry = AppRetry(15)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _networkObserver.register()
         setContent {
             AppTheme {
-                Content(
-                    onClickStart = {
-                        _retry.startRetry()
-                    },
-                    onClickStop = {
-                        _retry.stopRetry()
-                    }
-                )
+                Content()
             }
         }
     }
@@ -54,37 +48,28 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Content(
-    onClickStart: () -> Unit,
-    onClickStop: () -> Unit,
-) {
+private fun Content() {
+    val activity = LocalContext.current as Activity
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Button(
-            onClick = onClickStart
+            onClick = {
+                activity.startActivity(Intent(activity, RetryActivity::class.java))
+            }
         ) {
-            Text(text = "start")
+            Text(text = "Retry")
         }
 
         Button(
-            onClick = onClickStop
-        ) {
-            Text(text = "stop")
-        }
-    }
-}
+            onClick = {
 
-@Preview(showBackground = true)
-@Composable
-private fun DefaultPreview() {
-    AppTheme {
-        Content(
-            onClickStart = {},
-            onClickStop = {},
-        )
+            }
+        ) {
+            Text(text = "RetryExt")
+        }
     }
 }
 
