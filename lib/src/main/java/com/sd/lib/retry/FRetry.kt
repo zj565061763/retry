@@ -145,21 +145,27 @@ abstract class FRetry(
      *
      * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
      */
-    protected open fun onStart() {}
+    protected open fun onStart() {
+        _callback?.onStart()
+    }
 
     /**
      * 暂停回调（UI线程）
      *
      * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做通知事件
      */
-    protected open fun onPause() {}
+    protected open fun onPause() {
+        _callback?.onPause()
+    }
 
     /**
      * 结束回调（UI线程）
      *
      * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做通知事件
      */
-    protected open fun onStop() {}
+    protected open fun onStop() {
+        _callback?.onStop()
+    }
 
     /**
      * 重试回调（UI线程），返回false将停止重试
@@ -223,6 +229,21 @@ abstract class FRetry(
     }
 
     abstract class Callback {
+        /**
+         * 开始回调（UI线程）
+         */
+        open fun onStart() {}
+
+        /**
+         * 暂停回调（UI线程）
+         */
+        open fun onPause() {}
+
+        /**
+         * 结束回调（UI线程）
+         */
+        open fun onStop() {}
+
         /**
          * 重试回调（UI线程），返回false将停止重试
          */
