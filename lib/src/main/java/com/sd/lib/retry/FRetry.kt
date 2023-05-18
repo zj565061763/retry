@@ -110,7 +110,7 @@ abstract class FRetry(
 
             if (!checkRetry) {
                 state = State.Paused
-                _mainHandler.post { onPause() }
+                notifyPause()
                 return
             }
 
@@ -138,6 +138,13 @@ abstract class FRetry(
         }
     }
 
+    private fun notifyPause() {
+        _mainHandler.post {
+            _callback?.onPause()
+            onPause()
+        }
+    }
+
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
@@ -159,9 +166,7 @@ abstract class FRetry(
      *
      * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做通知事件
      */
-    protected open fun onPause() {
-        _callback?.onPause()
-    }
+    protected open fun onPause() {}
 
     /**
      * 结束回调（UI线程）
