@@ -45,23 +45,27 @@ suspend fun <T> fRetry(
             setRetryInterval(retryInterval)
         }
         retry.setCallback(object : FRetry.Callback() {
+            private var _lastResult: Result<T>? = null
+
             override fun onRetry(session: FRetry.Session): Boolean {
                 scope.launch {
-                    val result = block()
+                    val result = block().also {
+                        _lastResult = it
+                    }
                     result.onSuccess {
                         session.finish()
                         cont.resume(result)
                     }
                     result.onFailure {
-                        if (retry.retryCount >= maxRetryCount) {
-                            session.finish()
-                            cont.resume(result)
-                        } else {
-                            session.retry()
-                        }
+                        session.retry()
                     }
                 }
                 return scope.isActive
+            }
+
+            override fun onRetryMaxCount() {
+                super.onRetryMaxCount()
+                cont.resume(_lastResult!!)
             }
         })
 
