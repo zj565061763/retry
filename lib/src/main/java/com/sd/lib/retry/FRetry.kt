@@ -32,7 +32,7 @@ abstract class FRetry(
     /**
      * 设置回调对象
      */
-    fun setCallback(callback: Callback?) {
+    internal fun setCallback(callback: Callback?) {
         _callback = callback
     }
 
@@ -248,7 +248,7 @@ abstract class FRetry(
         Paused
     }
 
-    abstract class Callback {
+    internal abstract class Callback {
         /**
          * 开始回调（UI线程）
          */
