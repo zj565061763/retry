@@ -52,7 +52,7 @@ abstract class FRetry(
         if (state == State.Idle) {
             state = State.Running
             retryCount = 0
-            _mainHandler.post { onStart() }
+            notifyStart()
             retryDelayed(0)
         }
     }
@@ -131,6 +131,13 @@ abstract class FRetry(
         return _callback?.onRetry(session) ?: onRetry(session)
     }
 
+    private fun notifyStart() {
+        _mainHandler.post {
+            _callback?.onStart()
+            onStart()
+        }
+    }
+
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
@@ -145,9 +152,7 @@ abstract class FRetry(
      *
      * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
      */
-    protected open fun onStart() {
-        _callback?.onStart()
-    }
+    protected open fun onStart() {}
 
     /**
      * 暂停回调（UI线程）
