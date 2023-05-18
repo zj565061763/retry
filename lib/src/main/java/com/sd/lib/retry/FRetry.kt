@@ -121,13 +121,13 @@ abstract class FRetry(
         }
 
         session?.let {
-            if (!retry(it)) {
+            if (!notifyRetry(it)) {
                 stopRetry()
             }
         }
     }
 
-    private fun retry(session: Session): Boolean {
+    private fun notifyRetry(session: Session): Boolean {
         return _callback?.onRetry(session) ?: onRetry(session)
     }
 
