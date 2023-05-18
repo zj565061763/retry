@@ -89,7 +89,7 @@ abstract class FRetry(
         check(state == State.Running)
         if (retryCount >= maxRetryCount) {
             stopRetry()
-            _mainHandler.post { onRetryMaxCount() }
+            notifyRetryMaxCount()
         } else {
             _mainHandler.removeCallbacks(_retryRunnable)
             _mainHandler.postDelayed(_retryRunnable, delayMillis)
@@ -152,6 +152,13 @@ abstract class FRetry(
         }
     }
 
+    private fun notifyRetryMaxCount() {
+        _mainHandler.post {
+            _callback?.onRetryMaxCount()
+            onRetryMaxCount()
+        }
+    }
+
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
      *
@@ -190,9 +197,7 @@ abstract class FRetry(
     /**
      * 达到最大重试次数回调（UI线程）
      */
-    protected open fun onRetryMaxCount() {
-        _callback?.onRetryMaxCount()
-    }
+    protected open fun onRetryMaxCount() {}
 
     private inner class InternalSession : Session {
         var isFinish = false
