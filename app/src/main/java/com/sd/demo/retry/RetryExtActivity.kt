@@ -43,7 +43,10 @@ class RetryExtActivity : ComponentActivity() {
     private fun startRetry() {
         stopRetry()
         _scope.launch {
-            val result = fNetRetry {
+            val result = fNetRetry(
+                maxRetryCount = 10,
+                retryInterval = 1000,
+            ) {
                 _count++
                 logMsg { "retry $_count" }
                 if (_count >= 5) {
