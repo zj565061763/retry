@@ -46,6 +46,10 @@ class RetryExtActivity : ComponentActivity() {
             val result = fNetRetry(
                 maxRetryCount = 15,
                 retryInterval = 1000,
+                onStart = { logMsg { "retry onStart" } },
+                onPause = { logMsg { "retry onPause" } },
+                onStop = { logMsg { "retry onStop" } },
+                onRetryMaxCount = { logMsg { "retry onRetryMaxCount" } },
             ) {
                 _count++
                 logMsg { "retry $_count" }
@@ -56,10 +60,10 @@ class RetryExtActivity : ComponentActivity() {
                 }
             }
             result.onSuccess {
-                logMsg { "retry onSuccess $it" }
+                logMsg { "retry success $it" }
             }
             result.onFailure {
-                logMsg { "retry onFailure $it" }
+                logMsg { "retry failure $it" }
             }
         }.also {
             _retryJob = it

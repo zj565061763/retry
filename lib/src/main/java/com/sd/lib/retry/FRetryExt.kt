@@ -17,12 +17,20 @@ suspend fun <T> fNetRetry(
             }
         }
     },
-    block: suspend () -> Result<T>
+    onStart: (() -> Unit)? = null,
+    onPause: (() -> Unit)? = null,
+    onStop: (() -> Unit)? = null,
+    onRetryMaxCount: (() -> Unit)? = null,
+    block: suspend () -> Result<T>,
 ): Result<T> {
     return fRetry(
         maxRetryCount = maxRetryCount,
         retryInterval = retryInterval,
         factory = { factory() },
+        onStart = onStart,
+        onPause = onPause,
+        onStop = onStop,
+        onRetryMaxCount = onRetryMaxCount,
         block = block,
     )
 }
@@ -37,7 +45,11 @@ suspend fun <T> fRetry(
             }
         }
     },
-    block: suspend () -> Result<T>
+    onStart: (() -> Unit)? = null,
+    onPause: (() -> Unit)? = null,
+    onStop: (() -> Unit)? = null,
+    onRetryMaxCount: (() -> Unit)? = null,
+    block: suspend () -> Result<T>,
 ): Result<T> {
     return suspendCancellableCoroutine { cont ->
         val scope = MainScope()
@@ -63,9 +75,25 @@ suspend fun <T> fRetry(
                 return scope.isActive
             }
 
+            override fun onStart() {
+                super.onStart()
+                onStart?.invoke()
+            }
+
+            override fun onPause() {
+                super.onPause()
+                onPause?.invoke()
+            }
+
+            override fun onStop() {
+                super.onStop()
+                onStop?.invoke()
+            }
+
             override fun onRetryMaxCount() {
                 super.onRetryMaxCount()
                 cont.resume(_lastResult!!)
+                onRetryMaxCount?.invoke()
             }
         })
 
