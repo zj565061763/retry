@@ -33,7 +33,7 @@ android {
 
 dependencies {
     implementation(libs.sd.ctx)
-    api(libs.kotlin.coroutines)
+    implementation(libs.kotlin.coroutines)
 }
 
 afterEvaluate {
