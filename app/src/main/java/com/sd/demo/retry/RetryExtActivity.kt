@@ -2,17 +2,7 @@ package com.sd.demo.retry
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.sd.demo.retry.ui.theme.AppTheme
+import com.sd.demo.retry.databinding.ActivityRetryExtBinding
 import com.sd.lib.retry.fNetRetry
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -20,23 +10,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class RetryExtActivity : ComponentActivity() {
+    private val _binding by lazy { ActivityRetryExtBinding.inflate(layoutInflater) }
+
     private val _scope = MainScope()
     private var _retryJob: Job? = null
     private var _count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            AppTheme {
-                Content(
-                    onClickStart = {
-                        startRetry()
-                    },
-                    onClickStop = {
-                        stopRetry()
-                    }
-                )
-            }
+        setContentView(_binding.root)
+        _binding.btnStart.setOnClickListener {
+            startRetry()
+        }
+        _binding.btnStop.setOnClickListener {
+            stopRetry()
         }
     }
 
@@ -78,29 +65,5 @@ class RetryExtActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _scope.cancel()
-    }
-}
-
-@Composable
-private fun Content(
-    onClickStart: () -> Unit,
-    onClickStop: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        Button(
-            onClick = onClickStart
-        ) {
-            Text(text = "start")
-        }
-
-        Button(
-            onClick = onClickStop
-        ) {
-            Text(text = "stop")
-        }
     }
 }

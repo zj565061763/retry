@@ -1,34 +1,27 @@
 package com.sd.demo.retry
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.sd.demo.retry.ui.theme.AppTheme
+import androidx.appcompat.app.AppCompatActivity
+import com.sd.demo.retry.databinding.ActivityMainBinding
 import com.sd.lib.retry.FNetworkObserver
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _networkObserver.register()
-        setContent {
-            AppTheme {
-                Content()
-            }
+        setContentView(_binding.root)
+
+        _binding.btnRetry.setOnClickListener {
+            startActivity(Intent(this, RetryActivity::class.java))
         }
+        _binding.btnRetryExt.setOnClickListener {
+            startActivity(Intent(this, RetryExtActivity::class.java))
+        }
+
+        _networkObserver.register()
     }
 
     private val _networkObserver = object : FNetworkObserver() {
@@ -47,32 +40,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-private fun Content() {
-    val activity = LocalContext.current as Activity
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        Button(
-            onClick = {
-                activity.startActivity(Intent(activity, RetryActivity::class.java))
-            }
-        ) {
-            Text(text = "Retry")
-        }
-
-        Button(
-            onClick = {
-                activity.startActivity(Intent(activity, RetryExtActivity::class.java))
-            }
-        ) {
-            Text(text = "RetryExt")
-        }
-    }
-}
-
 inline fun logMsg(block: () -> String) {
-    Log.i("FRetry-demo", block())
+    Log.i("retry-demo", block())
 }
