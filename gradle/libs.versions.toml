@@ -4,7 +4,7 @@ androidCompileSdk = "33"
 androidMinSdk = "21"
 androidTargetSdk = "33"
 
-androidGradlePlugin = "8.1.0"
+androidGradlePlugin = "8.1.1"
 kotlin = "1.8.22"
 
 [libraries]
@@ -12,7 +12,7 @@ kotlin = "1.8.22"
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
 
 kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
-sd-ctx = "com.github.zj565061763:ctx:1.1.1"
+sd-ctx = "com.github.zj565061763:ctx:1.2.0"
 
 junit = "junit:junit:4.13.2"
 androidx-test-ext-junit = "androidx.test.ext:junit:1.1.5"
