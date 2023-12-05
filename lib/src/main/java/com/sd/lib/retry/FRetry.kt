@@ -191,7 +191,7 @@ abstract class FRetry(
             set(value) {
                 require(value)
                 field = value
-                if (_currentSession === this) {
+                if (_currentSession === this@InternalSession) {
                     _currentSession = null
                 }
             }
