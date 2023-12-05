@@ -7,6 +7,12 @@ abstract class FRetry(
     /** 最大重试次数 */
     private val maxRetryCount: Int
 ) {
+    enum class State {
+        Idle,
+        Running,
+        Paused
+    }
+
     /** 当前状态 */
     @Volatile
     var state: State = State.Idle
@@ -224,11 +230,5 @@ abstract class FRetry(
          * 重新发起一次重试
          */
         fun retry()
-    }
-
-    enum class State {
-        Idle,
-        Running,
-        Paused
     }
 }
