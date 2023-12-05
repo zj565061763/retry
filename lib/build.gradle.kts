@@ -32,7 +32,6 @@ kotlin {
 
 dependencies {
     implementation(libs.sd.ctx)
-    implementation(libs.kotlin.coroutines)
 }
 
 afterEvaluate {

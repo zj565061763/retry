@@ -17,9 +17,6 @@ class MainActivity : AppCompatActivity() {
         _binding.btnRetry.setOnClickListener {
             startActivity(Intent(this, RetryActivity::class.java))
         }
-        _binding.btnRetryExt.setOnClickListener {
-            startActivity(Intent(this, RetryExtActivity::class.java))
-        }
 
         _networkObserver.register()
     }
