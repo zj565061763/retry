@@ -189,7 +189,7 @@ abstract class FRetry(
     private inner class InternalSession : Session {
         var isFinish = false
             set(value) {
-                require(value) { "Require true value." }
+                require(value)
                 field = value
                 if (_currentSession == this) {
                     _currentSession = null
