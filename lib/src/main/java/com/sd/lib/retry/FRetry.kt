@@ -149,7 +149,6 @@ abstract class FRetry(
 
     /**
      * 检查是否可以触发重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会触发暂停重试
-     *
      * 注意：此回调里不允许调用[stopRetry]方法停止重试
      */
     protected open fun checkRetry(): Boolean {
@@ -158,21 +157,18 @@ abstract class FRetry(
 
     /**
      * 开始回调（UI线程）
-     *
      * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
      */
     protected open fun onStart() {}
 
     /**
      * 暂停回调（UI线程）
-     *
      * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做通知事件
      */
     protected open fun onPause() {}
 
     /**
      * 结束回调（UI线程）
-     *
      * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做通知事件
      */
     protected open fun onStop() {}
