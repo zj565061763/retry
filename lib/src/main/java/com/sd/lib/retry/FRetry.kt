@@ -207,11 +207,11 @@ abstract class FRetry(
 
         override fun retry() {
             synchronized(this@FRetry) {
-                if (isFinish) return
-                isFinish = true
-
-                if (state == State.Running) {
-                    retryDelayed(_retryInterval)
+                if (!isFinish) {
+                    isFinish = true
+                    if (state == State.Running) {
+                        retryDelayed(_retryInterval)
+                    }
                 }
             }
         }
