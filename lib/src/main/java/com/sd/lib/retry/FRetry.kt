@@ -97,8 +97,7 @@ abstract class FRetry(
     private fun retryOnUiThread() {
         check(Looper.myLooper() == Looper.getMainLooper())
 
-        var session: Session? = null
-        synchronized(this@FRetry) {
+        val session = synchronized(this@FRetry) {
             if (state != State.Running) return
             if (retryCount >= maxRetryCount) return
             if (_currentSession != null) error("Current session is not finished.")
@@ -113,20 +112,18 @@ abstract class FRetry(
             }
 
             retryCount++
-            _currentSession = InternalSession().also {
-                session = it
+            InternalSession().also {
+                _currentSession = it
             }
         }
 
-        session?.let {
-            if (!notifyRetry(it)) {
+        if (state == State.Running) {
+            if (onRetry(session)) {
+                // retry
+            } else {
                 stopRetry()
             }
         }
-    }
-
-    private fun notifyRetry(session: Session): Boolean {
-        return onRetry(session)
     }
 
     private fun notifyStart() {
