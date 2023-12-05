@@ -198,10 +198,10 @@ abstract class FRetry(
 
         override fun finish() {
             synchronized(this@FRetry) {
-                if (isFinish) return
-                isFinish = true
-
-                stopRetry()
+                if (!isFinish) {
+                    isFinish = true
+                    stopRetry()
+                }
             }
         }
 
