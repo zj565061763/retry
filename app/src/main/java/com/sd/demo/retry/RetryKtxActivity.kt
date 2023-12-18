@@ -28,7 +28,10 @@ class RetryKtxActivity : AppCompatActivity() {
         logMsg { "start $uuid" }
 
         val result = try {
-            fNetRetry(maxCount = 15) {
+            fNetRetry(
+                maxCount = 15,
+                interval = 1_000,
+            ) {
                 logMsg { "retry $retryCount" }
                 if (retryCount >= 10) {
                     Result.success("hello")
