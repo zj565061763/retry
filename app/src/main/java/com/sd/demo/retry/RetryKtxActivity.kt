@@ -36,7 +36,7 @@ class RetryKtxActivity : AppCompatActivity() {
                 if (retryCount >= 10) {
                     Result.success("hello")
                 } else {
-                    Result.failure(Throwable(""))
+                    Result.failure(Throwable("failure $retryCount"))
                 }
             }
         } catch (e: Exception) {

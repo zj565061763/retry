@@ -51,6 +51,8 @@ suspend fun <T> fRetry(
             get() = counter.get()
     }
 
+    var cause: Throwable? = null
+
     while (true) {
         counter.getAndIncrement()
         check()
@@ -63,8 +65,11 @@ suspend fun <T> fRetry(
             return result
         }
 
+        // 保存最后一次的异常
+        cause = result.exceptionOrNull()
+
         if (counter.get() >= maxCount) {
-            return Result.failure(FRetryExceptionRetryMaxCount())
+            return Result.failure(FRetryExceptionRetryMaxCount(checkNotNull(cause)))
         }
 
         delay(interval)
@@ -79,4 +84,4 @@ interface FRetryScope {
 /**
  * 达到最大重试次数
  */
-class FRetryExceptionRetryMaxCount : Exception()
+class FRetryExceptionRetryMaxCount(cause: Throwable) : Exception(cause)
