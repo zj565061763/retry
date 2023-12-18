@@ -12,7 +12,7 @@ kotlin = "1.9.21"
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
 kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 
-sd-network = "com.github.zj565061763:network:1.0.0-beta01"
+sd-network = "com.github.zj565061763:network:1.0.0"
 sd-coroutine = "com.github.zj565061763:coroutine:1.3.0"
 
 androidx-test-ext-junit = "androidx.test.ext:junit:1.1.5"
