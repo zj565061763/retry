@@ -4,14 +4,15 @@ androidCompileSdk = "34"
 androidMinSdk = "21"
 androidTargetSdk = "34"
 
-androidGradlePlugin = "8.1.4"
+androidGradlePlugin = "8.2.0"
 kotlin = "1.9.21"
 
 [libraries]
 
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
+kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 
-sd-ctx = "com.github.zj565061763:ctx:1.2.0"
+sd-network = "com.github.zj565061763:network:1.0.0-beta01"
 
 androidx-test-ext-junit = "androidx.test.ext:junit:1.1.5"
 androidx-test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"

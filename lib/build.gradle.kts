@@ -31,7 +31,8 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.sd.ctx)
+    implementation(libs.sd.network)
+    implementation(libs.kotlin.coroutines)
 }
 
 afterEvaluate {

@@ -29,21 +29,21 @@ private class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
 
     override fun onStart() {
         super.onStart()
-        logMsg { "AppRetry onStart" }
+        logMsg { "onStart" }
     }
 
     override fun onPause() {
         super.onPause()
-        logMsg { "AppRetry onPause" }
+        logMsg { "onPause" }
     }
 
     override fun onStop() {
         super.onStop()
-        logMsg { "AppRetry onStop" }
+        logMsg { "onStop" }
     }
 
     override fun onRetry(session: Session): Boolean {
-        logMsg { "AppRetry onRetry $retryCount" }
+        logMsg { "onRetry $retryCount" }
 
         if (retryCount >= 10) {
             session.finish()
@@ -56,6 +56,6 @@ private class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
 
     override fun onRetryMaxCount() {
         super.onRetryMaxCount()
-        logMsg { "AppRetry onRetryMaxCount" }
+        logMsg { "onRetryMaxCount" }
     }
 }

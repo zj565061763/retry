@@ -1,5 +1,7 @@
 package com.sd.lib.retry
 
+import com.sd.lib.network.FNetworkObserver
+
 abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
 
     override fun checkRetry(): Boolean {
