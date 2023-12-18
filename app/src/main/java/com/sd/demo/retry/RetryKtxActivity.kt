@@ -29,6 +29,7 @@ class RetryKtxActivity : AppCompatActivity() {
 
         val result = try {
             fNetRetry(maxCount = 15) {
+                logMsg { "retry $retryCount" }
                 if (retryCount >= 10) {
                     Result.success("hello")
                 } else {
