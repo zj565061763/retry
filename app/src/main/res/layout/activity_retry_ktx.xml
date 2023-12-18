@@ -6,17 +6,17 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_retry"
+        android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="retry"
+        android:text="start"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_retry_ktx"
+        android:id="@+id/btn_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="retry ktx"
+        android:text="stop"
         android:textAllCaps="false" />
 
 </LinearLayout>

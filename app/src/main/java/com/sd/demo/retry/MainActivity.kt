@@ -12,8 +12,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
+
         _binding.btnRetry.setOnClickListener {
             startActivity(Intent(this, RetryActivity::class.java))
+        }
+
+        _binding.btnRetryKtx.setOnClickListener {
+            startActivity(Intent(this, RetryKtxActivity::class.java))
         }
     }
 }
