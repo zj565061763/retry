@@ -27,6 +27,12 @@ private class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
         setRetryInterval(1000)
     }
 
+    override fun calculateInterval(interval: Long): Long {
+        val result = (interval * retryCount).coerceAtMost(5_000)
+        logMsg { "calculateInterval:$result" }
+        return result
+    }
+
     override fun onStart() {
         super.onStart()
         logMsg { "onStart" }
