@@ -159,6 +159,13 @@ abstract class FRetry(
     }
 
     /**
+     * 计算重试间隔
+     */
+    protected open fun calculateInterval(interval: Long): Long {
+        return interval
+    }
+
+    /**
      * 开始回调（UI线程）
      * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
      */
@@ -210,7 +217,8 @@ abstract class FRetry(
                 if (!isFinish) {
                     isFinish = true
                     if (state == State.Running) {
-                        retryDelayed(_retryInterval)
+                        val interval = calculateInterval(_retryInterval)
+                        retryDelayed(interval)
                     }
                 }
             }
