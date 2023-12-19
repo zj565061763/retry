@@ -32,7 +32,6 @@ kotlin {
 
 dependencies {
     implementation(libs.sd.network)
-    implementation(libs.kotlin.coroutines)
 }
 
 afterEvaluate {
