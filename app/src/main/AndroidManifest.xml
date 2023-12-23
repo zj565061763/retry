@@ -25,6 +25,7 @@
         </activity>
 
         <activity android:name=".RetryActivity" />
+        <activity android:name=".RetryKtxActivity" />
 
     </application>
 
