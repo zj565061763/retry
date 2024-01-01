@@ -266,15 +266,25 @@ abstract class FRetry(
             }
         }
 
-        private fun remove(
+        /**
+         * 停止
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun stop(
             clazz: Class<out FRetry>,
-            key: String,
+            key: String = "",
         ) {
+            remove(clazz, key)?.stopRetry()
+        }
+
+        private fun remove(clazz: Class<out FRetry>, key: String): FRetry? {
             synchronized(sLock) {
-                val holder = sHolder[clazz] ?: return
-                holder.remove(key)
-                if (holder.isEmpty()) {
-                    sHolder.remove(clazz)
+                val holder = sHolder[clazz] ?: return null
+                return holder.remove(key).also {
+                    if (holder.isEmpty()) {
+                        sHolder.remove(clazz)
+                    }
                 }
             }
         }
