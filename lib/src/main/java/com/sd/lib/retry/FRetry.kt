@@ -92,7 +92,6 @@ abstract class FRetry(
             stopRetry()
             notifyRetryMaxCount()
         } else {
-            _mainHandler.removeCallbacks(_retryRunnable)
             _mainHandler.postDelayed(_retryRunnable, delayMillis)
         }
     }
