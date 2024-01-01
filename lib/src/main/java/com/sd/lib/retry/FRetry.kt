@@ -30,6 +30,8 @@ abstract class FRetry(
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { retryOnUiThread() }
 
+    internal var onStopCallback: (() -> Unit)? = null
+
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
     }
@@ -65,6 +67,7 @@ abstract class FRetry(
             _mainHandler.removeCallbacks(_retryRunnable)
             _currentSession?.let { it.isFinish = true }
             _currentSession = null
+            onStopCallback?.invoke()
             notifyStop()
         }
     }
@@ -235,5 +238,45 @@ abstract class FRetry(
          * 重新发起一次重试
          */
         fun retry()
+    }
+
+    companion object {
+        private val sLock = this@Companion
+        private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, FRetry>> = hashMapOf()
+
+        /**
+         * 开始
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun <T : FRetry> start(
+            clazz: Class<T>,
+            key: String = "",
+            factory: () -> T = { clazz.getDeclaredConstructor().newInstance() },
+        ): T {
+            return synchronized(sLock) {
+                val holder = sHolder.getOrPut(clazz) { hashMapOf() }
+                val retry = holder.getOrPut(key) {
+                    factory().apply { this.onStopCallback = { remove(clazz, key) } }
+                }
+                @Suppress("UNCHECKED_CAST")
+                retry as T
+            }.also {
+                it.startRetry()
+            }
+        }
+
+        private fun remove(
+            clazz: Class<out FRetry>,
+            key: String,
+        ) {
+            synchronized(sLock) {
+                val holder = sHolder[clazz] ?: return
+                holder.remove(key)
+                if (holder.isEmpty()) {
+                    sHolder.remove(clazz)
+                }
+            }
+        }
     }
 }
