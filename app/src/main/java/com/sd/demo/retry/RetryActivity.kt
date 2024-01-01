@@ -4,52 +4,46 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.retry.databinding.ActivityRetryBinding
 import com.sd.lib.retry.FNetRetry
+import com.sd.lib.retry.FRetry
 
 class RetryActivity : AppCompatActivity() {
     private val _binding by lazy { ActivityRetryBinding.inflate(layoutInflater) }
-    private val _retry = AppRetry(15)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
         _binding.btnStart.setOnClickListener {
-            _retry.startRetry()
+            FRetry.start(AppRetry::class.java)
         }
         _binding.btnStop.setOnClickListener {
-            _retry.stopRetry()
+            FRetry.stop(AppRetry::class.java)
         }
     }
 }
 
-private class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
+internal class AppRetry : FNetRetry(15) {
 
     init {
         setRetryInterval(1000)
     }
 
-    override fun calculateInterval(interval: Long): Long {
-        val result = (interval * retryCount).coerceAtMost(5_000)
-        logMsg { "calculateInterval:$result" }
-        return result
-    }
-
     override fun onStart() {
         super.onStart()
-        logMsg { "onStart" }
+        logMsg { "$this onStart" }
     }
 
     override fun onPause() {
         super.onPause()
-        logMsg { "onPause" }
+        logMsg { "$this onPause" }
     }
 
     override fun onStop() {
         super.onStop()
-        logMsg { "onStop" }
+        logMsg { "$this onStop" }
     }
 
     override fun onRetry(session: Session): Boolean {
-        logMsg { "onRetry $retryCount" }
+        logMsg { "$this onRetry $retryCount" }
 
         if (retryCount >= 10) {
             session.finish()
@@ -62,6 +56,6 @@ private class AppRetry(maxRetryCount: Int) : FNetRetry(maxRetryCount) {
 
     override fun onRetryMaxCount() {
         super.onRetryMaxCount()
-        logMsg { "onRetryMaxCount" }
+        logMsg { "$this onRetryMaxCount" }
     }
 }
