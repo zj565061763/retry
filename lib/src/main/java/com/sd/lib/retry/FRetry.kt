@@ -8,8 +8,11 @@ abstract class FRetry(
     private val maxRetryCount: Int
 ) {
     enum class State {
+        /** 空闲 */
         Idle,
+        /** 重试中 */
         Running,
+        /** 暂停 */
         Paused
     }
 
