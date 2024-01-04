@@ -6,14 +6,10 @@ abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
 
     override fun checkRetry(): Boolean {
         if (!FNetworkObserver.isNetworkAvailable()) {
+            _networkObserver.register()
             return false
         }
         return super.checkRetry()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        _networkObserver.register()
     }
 
     override fun onStop() {
