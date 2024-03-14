@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         _binding.btnRetryKtx.setOnClickListener {
-            startActivity(Intent(this, RetryKtxActivity::class.java))
+            startActivity(Intent(this, SampleRetryKtx::class.java))
         }
     }
 }

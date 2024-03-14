@@ -2,13 +2,13 @@ package com.sd.demo.retry
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.retry.databinding.ActivityRetryKtxBinding
+import com.sd.demo.retry.databinding.SampleRetryKtxBinding
 import com.sd.lib.coroutine.FScope
 import com.sd.lib.retry.fNetRetry
 import java.util.UUID
 
-class RetryKtxActivity : AppCompatActivity() {
-    private val _binding by lazy { ActivityRetryKtxBinding.inflate(layoutInflater) }
+class SampleRetryKtx : AppCompatActivity() {
+    private val _binding by lazy { SampleRetryKtxBinding.inflate(layoutInflater) }
 
     private val _scope = FScope()
 
