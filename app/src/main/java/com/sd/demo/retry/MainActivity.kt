@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(_binding.root)
 
         _binding.btnRetry.setOnClickListener {
-            startActivity(Intent(this, RetryActivity::class.java))
+            startActivity(Intent(this, SampleRetry::class.java))
         }
 
         _binding.btnRetryKtx.setOnClickListener {

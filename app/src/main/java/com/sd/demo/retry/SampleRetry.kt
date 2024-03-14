@@ -2,12 +2,12 @@ package com.sd.demo.retry
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.retry.databinding.ActivityRetryBinding
+import com.sd.demo.retry.databinding.SampleRetryBinding
 import com.sd.lib.retry.FNetRetry
 import com.sd.lib.retry.FRetry
 
-class RetryActivity : AppCompatActivity() {
-    private val _binding by lazy { ActivityRetryBinding.inflate(layoutInflater) }
+class SampleRetry : AppCompatActivity() {
+    private val _binding by lazy { SampleRetryBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

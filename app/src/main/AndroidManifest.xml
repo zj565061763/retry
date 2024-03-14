@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".RetryActivity" />
+        <activity android:name=".SampleRetry" />
         <activity android:name=".RetryKtxActivity" />
 
     </application>
