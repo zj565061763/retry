@@ -7,7 +7,7 @@ android {
     namespace = "com.sd.demo.retry"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
-        minSdk = libs.versions.androidMinSdk.get().toInt()
+        minSdk = 21
         targetSdk = libs.versions.androidTargetSdk.get().toInt()
         applicationId = "com.sd.demo.retry"
         versionCode = 1
@@ -37,8 +37,11 @@ kotlin {
 
 dependencies {
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel)
+
     implementation(libs.sd.coroutine)
 
+    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
 
