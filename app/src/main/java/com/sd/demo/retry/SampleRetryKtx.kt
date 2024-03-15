@@ -2,6 +2,7 @@ package com.sd.demo.retry
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sd.demo.retry.databinding.SampleRetryKtxBinding
 import com.sd.lib.coroutine.FScope
 import com.sd.lib.retry.fNetRetry
@@ -10,7 +11,7 @@ import java.util.UUID
 class SampleRetryKtx : AppCompatActivity() {
     private val _binding by lazy { SampleRetryKtxBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope()
+    private val _scope = FScope(lifecycleScope)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,10 +52,5 @@ class SampleRetryKtx : AppCompatActivity() {
         result.onFailure {
             logMsg { "onFailure $it $uuid" }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _scope.cancel()
     }
 }
