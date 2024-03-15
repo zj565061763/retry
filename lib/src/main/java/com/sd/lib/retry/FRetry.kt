@@ -238,6 +238,7 @@ abstract class FRetry(
 
     companion object {
         private val sLock = this@Companion
+
         private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, RetryRef<FRetry>>> = hashMapOf()
         private val sRefQueue = ReferenceQueue<FRetry>()
 
