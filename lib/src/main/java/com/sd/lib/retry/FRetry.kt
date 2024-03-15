@@ -28,7 +28,7 @@ abstract class FRetry(
 
     /** 重试间隔 */
     private var _retryInterval: Long = 3000L
-    private var _currentSession: InternalSession? = null
+    private var _currentSession: SessionImpl? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { retryOnUiThread() }
@@ -117,7 +117,7 @@ abstract class FRetry(
             }
 
             retryCount++
-            InternalSession().also { _currentSession = it }
+            SessionImpl().also { _currentSession = it }
         }
 
         if (state == State.Running) {
@@ -192,12 +192,12 @@ abstract class FRetry(
      */
     abstract fun onRetry(session: Session): Boolean
 
-    private inner class InternalSession : Session {
+    private inner class SessionImpl : Session {
         var isFinish = false
             set(value) {
                 require(value)
                 field = value
-                if (_currentSession === this@InternalSession) {
+                if (_currentSession === this@SessionImpl) {
                     _currentSession = null
                 }
             }
