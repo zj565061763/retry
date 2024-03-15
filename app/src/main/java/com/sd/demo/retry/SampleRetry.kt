@@ -19,6 +19,11 @@ class SampleRetry : AppCompatActivity() {
             FRetry.stop(AppRetry::class.java)
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        FRetry.stop(AppRetry::class.java)
+    }
 }
 
 internal class AppRetry : FNetRetry(15) {
