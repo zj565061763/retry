@@ -195,8 +195,8 @@ abstract class FRetry(
     private inner class SessionImpl : Session {
         var isFinish = false
             set(value) {
-                require(value)
-                field = value
+                require(value) { "Require true value." }
+                field = true
                 if (_currentSession === this@SessionImpl) {
                     _currentSession = null
                 }
