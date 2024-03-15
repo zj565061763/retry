@@ -261,13 +261,8 @@ abstract class FRetry(
         ): T {
             return synchronized(sLock) {
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
-
-                holder[key]?.get()?.let {
-                    @Suppress("UNCHECKED_CAST")
-                    return it as T
-                }
-
-                factory().also { retry ->
+                @Suppress("UNCHECKED_CAST")
+                holder[key]?.get() as? T ?: factory().also { retry ->
                     holder[key] = RetryRef(
                         referent = retry,
                         queue = sRefQueue,
