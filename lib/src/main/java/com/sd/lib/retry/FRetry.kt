@@ -117,9 +117,7 @@ abstract class FRetry(
             }
 
             retryCount++
-            InternalSession().also {
-                _currentSession = it
-            }
+            InternalSession().also { _currentSession = it }
         }
 
         if (state == State.Running) {
