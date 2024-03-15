@@ -2,6 +2,9 @@ package com.sd.lib.retry
 
 import android.os.Handler
 import android.os.Looper
+import android.os.MessageQueue
+import java.lang.ref.ReferenceQueue
+import java.lang.ref.WeakReference
 
 abstract class FRetry(
     /** 最大重试次数 */
@@ -32,8 +35,6 @@ abstract class FRetry(
 
     private val _mainHandler = Handler(Looper.getMainLooper())
     private val _retryRunnable = Runnable { retryOnUiThread() }
-
-    internal var onStopCallback: (() -> Unit)? = null
 
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
@@ -70,7 +71,6 @@ abstract class FRetry(
             _mainHandler.removeCallbacks(_retryRunnable)
             _currentSession?.let { it.isFinish = true }
             _currentSession = null
-            onStopCallback?.invoke()
             notifyStop()
         }
     }
@@ -238,7 +238,13 @@ abstract class FRetry(
 
     companion object {
         private val sLock = this@Companion
-        private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, FRetry>> = hashMapOf()
+        private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, RetryRef<FRetry>>> = hashMapOf()
+        private val sRefQueue = ReferenceQueue<FRetry>()
+
+        private val sIdleHandler = MainIdleHandler {
+            releaseRef()
+            sHolder.isNotEmpty()
+        }
 
         /**
          * 开始
@@ -252,13 +258,23 @@ abstract class FRetry(
         ): T {
             return synchronized(sLock) {
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
-                val retry = holder.getOrPut(key) {
-                    factory().apply { this.onStopCallback = { remove(clazz, key) } }
+
+                holder[key]?.get()?.let {
+                    @Suppress("UNCHECKED_CAST")
+                    return it as T
                 }
-                @Suppress("UNCHECKED_CAST")
-                retry as T
+
+                factory().also { retry ->
+                    holder[key] = RetryRef(
+                        referent = retry,
+                        queue = sRefQueue,
+                        clazz = clazz,
+                        key = key
+                    )
+                }
             }.also {
                 it.startRetry()
+                sIdleHandler.register()
             }
         }
 
@@ -271,18 +287,65 @@ abstract class FRetry(
             clazz: Class<out FRetry>,
             key: String = "",
         ) {
-            remove(clazz, key)?.stopRetry()
+            synchronized(sLock) {
+                sHolder[clazz]?.get(key)?.get()
+            }?.stopRetry()
         }
 
-        private fun remove(clazz: Class<out FRetry>, key: String): FRetry? {
+        private fun releaseRef() {
             synchronized(sLock) {
-                val holder = sHolder[clazz] ?: return null
-                return holder.remove(key).also {
-                    if (holder.isEmpty()) {
-                        sHolder.remove(clazz)
+                while (true) {
+                    val ref = sRefQueue.poll() ?: return
+                    check(ref is RetryRef)
+                    sHolder[ref.clazz]?.let { holder ->
+                        holder.remove(ref.key)
+                        if (holder.isEmpty()) {
+                            sHolder.remove(ref.clazz)
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+private class RetryRef<T>(
+    referent: T,
+    queue: ReferenceQueue<T>,
+    val clazz: Class<out FRetry>,
+    val key: String,
+) : WeakReference<T>(referent, queue)
+
+private class MainIdleHandler(
+    private val block: () -> Boolean,
+) {
+    private var _idleHandler: MessageQueue.IdleHandler? = null
+
+    fun register() {
+        val mainLooper = Looper.getMainLooper() ?: return
+        if (mainLooper === Looper.myLooper()) {
+            addIdleHandler()
+        } else {
+            Handler(mainLooper).post { addIdleHandler() }
+        }
+    }
+
+    private fun addIdleHandler() {
+        val myLooper = Looper.myLooper() ?: return
+        check(myLooper === Looper.getMainLooper())
+
+        _idleHandler?.let { return }
+        MessageQueue.IdleHandler {
+            block().also { keep ->
+                if (keep) {
+                    // keep
+                } else {
+                    _idleHandler = null
+                }
+            }
+        }.also {
+            _idleHandler = it
+            Looper.myQueue().addIdleHandler(it)
         }
     }
 }
