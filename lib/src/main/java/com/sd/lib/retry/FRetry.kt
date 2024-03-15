@@ -242,8 +242,10 @@ abstract class FRetry(
         private val sRefQueue = ReferenceQueue<FRetry>()
 
         private val sIdleHandler = MainIdleHandler {
-            releaseRef()
-            sHolder.isNotEmpty()
+            synchronized(sLock) {
+                releaseRefLocked()
+                sHolder.isNotEmpty()
+            }
         }
 
         /**
@@ -292,16 +294,14 @@ abstract class FRetry(
             }?.stopRetry()
         }
 
-        private fun releaseRef() {
-            synchronized(sLock) {
-                while (true) {
-                    val ref = sRefQueue.poll() ?: return
-                    check(ref is RetryRef)
-                    sHolder[ref.clazz]?.let { holder ->
-                        holder.remove(ref.key)
-                        if (holder.isEmpty()) {
-                            sHolder.remove(ref.clazz)
-                        }
+        private fun releaseRefLocked() {
+            while (true) {
+                val ref = sRefQueue.poll() ?: return
+                check(ref is RetryRef)
+                sHolder[ref.clazz]?.let { holder ->
+                    holder.remove(ref.key)
+                    if (holder.isEmpty()) {
+                        sHolder.remove(ref.clazz)
                     }
                 }
             }
