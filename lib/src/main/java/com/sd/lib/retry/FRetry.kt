@@ -100,7 +100,7 @@ abstract class FRetry(
     }
 
     private fun retryOnUiThread() {
-        check(Looper.myLooper() == Looper.getMainLooper())
+        check(Looper.myLooper() === Looper.getMainLooper())
 
         val session = synchronized(this@FRetry) {
             if (state != State.Running) return
