@@ -142,24 +142,25 @@ abstract class FRetry(
 
     /**
      * 开始回调（UI线程）
-     * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做通知事件
+     * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做事件通知
      */
     protected open fun onStart() = Unit
 
     /**
      * 暂停回调（UI线程）
-     * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做通知事件
+     * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做事件通知
      */
     protected open fun onPause() = Unit
 
     /**
      * 结束回调（UI线程）
-     * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做通知事件
+     * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做事件通知
      */
     protected open fun onStop() = Unit
 
     /**
      * 达到最大重试次数回调（UI线程）
+     * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做事件通知
      */
     protected open fun onRetryMaxCount() = Unit
 
