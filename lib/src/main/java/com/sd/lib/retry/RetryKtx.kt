@@ -4,7 +4,6 @@ import com.sd.lib.network.fAwaitNetworkAvailable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import java.util.concurrent.atomic.AtomicInteger
 
 suspend fun <T> fNetRetry(
     /** 最多执行几次 */
@@ -45,14 +44,10 @@ suspend fun <T> fRetry(
 ): Result<T> {
     require(maxCount > 0)
 
-    val counter = AtomicInteger(0)
-
-    val scope = object : FRetryScope {
-        override val retryCount: Int get() = counter.get()
-    }
+    val scope = RetryScopeImpl()
 
     while (true) {
-        counter.getAndIncrement()
+        scope.increaseRetryCount()
         with(scope) { beforeBlock() }
 
         currentCoroutineContext().ensureActive()
@@ -63,7 +58,7 @@ suspend fun <T> fRetry(
             return result
         }
 
-        if (counter.get() >= maxCount) {
+        if (scope.retryCount >= maxCount) {
             val cause = checkNotNull(result.exceptionOrNull())
             return Result.failure(FRetryExceptionRetryMaxCount(cause))
         }
@@ -75,6 +70,16 @@ suspend fun <T> fRetry(
 interface FRetryScope {
     /** 当前重试的次数 */
     val retryCount: Int
+}
+
+private class RetryScopeImpl : FRetryScope {
+    private var _retryCount = 0
+
+    override val retryCount: Int get() = _retryCount
+
+    fun increaseRetryCount() {
+        _retryCount++
+    }
 }
 
 /**
