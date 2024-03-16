@@ -216,7 +216,7 @@ abstract class FRetry(
     companion object {
         private val sLock = this@Companion
 
-        private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, RetryRef<FRetry>>> = hashMapOf()
+        private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, WeakRef<FRetry>>> = hashMapOf()
         private val sRefQueue = ReferenceQueue<FRetry>()
 
         private val sIdleHandler = MainIdleHandler {
@@ -240,11 +240,11 @@ abstract class FRetry(
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
                 holder[key]?.get() as? T ?: factory().also { instance ->
-                    holder[key] = RetryRef(
+                    holder[key] = WeakRef(
                         referent = instance,
                         queue = sRefQueue,
                         clazz = clazz,
-                        key = key
+                        key = key,
                     )
                 }
             }.also {
@@ -270,7 +270,7 @@ abstract class FRetry(
         private fun releaseRefLocked() {
             while (true) {
                 val ref = sRefQueue.poll() ?: return
-                check(ref is RetryRef)
+                check(ref is WeakRef)
                 sHolder[ref.clazz]?.let { holder ->
                     holder.remove(ref.key)
                     if (holder.isEmpty()) {
@@ -282,9 +282,9 @@ abstract class FRetry(
     }
 }
 
-private class RetryRef<T>(
+private class WeakRef<T>(
     referent: T,
-    queue: ReferenceQueue<T>,
+    queue: ReferenceQueue<in T>,
     val clazz: Class<out FRetry>,
     val key: String,
 ) : WeakReference<T>(referent, queue)
