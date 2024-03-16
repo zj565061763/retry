@@ -6,11 +6,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.util.concurrent.atomic.AtomicInteger
 
-interface FRetryScope {
-    /** 当前重试的次数 */
-    val retryCount: Int
-}
-
 suspend fun <T> fNetRetry(
     /** 最多执行几次 */
     maxCount: Int = Int.MAX_VALUE,
@@ -75,6 +70,11 @@ suspend fun <T> fRetry(
 
         delay(interval)
     }
+}
+
+interface FRetryScope {
+    /** 当前重试的次数 */
+    val retryCount: Int
 }
 
 /**
