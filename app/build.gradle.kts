@@ -7,8 +7,8 @@ android {
     namespace = "com.sd.demo.retry"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
+        targetSdk = libs.versions.androidCompileSdk.get().toInt()
         minSdk = 23
-        targetSdk = libs.versions.androidTargetSdk.get().toInt()
         applicationId = "com.sd.demo.retry"
         versionCode = 1
         versionName = "1.0"
