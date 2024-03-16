@@ -56,7 +56,7 @@ abstract class FRetry(
         if (state == State.Idle) {
             state = State.Running
             retryCount = 0
-            notifyStart()
+            _mainHandler.post { onStart() }
             retryDelayed(0)
         }
     }
@@ -71,7 +71,7 @@ abstract class FRetry(
             _mainHandler.removeCallbacks(_retryRunnable)
             _currentSession?.let { it.isFinish = true }
             _currentSession = null
-            notifyStop()
+            _mainHandler.post { onStop() }
         }
     }
 
@@ -93,7 +93,7 @@ abstract class FRetry(
         check(state == State.Running)
         if (retryCount >= maxRetryCount) {
             stopRetry()
-            notifyRetryMaxCount()
+            _mainHandler.post { onRetryMaxCount() }
         } else {
             _mainHandler.postDelayed(_retryRunnable, delayMillis)
         }
@@ -112,7 +112,7 @@ abstract class FRetry(
 
             if (!checkRetry) {
                 state = State.Paused
-                notifyPause()
+                _mainHandler.post { onPause() }
                 return
             }
 
@@ -126,30 +126,6 @@ abstract class FRetry(
             } else {
                 stopRetry()
             }
-        }
-    }
-
-    private fun notifyStart() {
-        _mainHandler.post {
-            onStart()
-        }
-    }
-
-    private fun notifyPause() {
-        _mainHandler.post {
-            onPause()
-        }
-    }
-
-    private fun notifyStop() {
-        _mainHandler.post {
-            onStop()
-        }
-    }
-
-    private fun notifyRetryMaxCount() {
-        _mainHandler.post {
-            onRetryMaxCount()
         }
     }
 
