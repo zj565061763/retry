@@ -213,7 +213,6 @@ abstract class FRetry(
     }
 
     companion object {
-        private val sLock = this@Companion
         private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, WeakRef<FRetry>>> = hashMapOf()
         private val sRefQueue = ReferenceQueue<FRetry>()
 
@@ -227,7 +226,7 @@ abstract class FRetry(
             key: String = "",
             factory: () -> T = { clazz.getDeclaredConstructor().newInstance() },
         ): T {
-            return synchronized(sLock) {
+            return synchronized(this@Companion) {
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
                 holder[key]?.get() as? T ?: factory().also { instance ->
@@ -253,7 +252,7 @@ abstract class FRetry(
             clazz: Class<out FRetry>,
             key: String = "",
         ) {
-            synchronized(sLock) {
+            synchronized(this@Companion) {
                 sHolder[clazz]?.get(key)?.get()
             }?.stopRetry()
         }
