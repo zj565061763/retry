@@ -2,7 +2,6 @@ package com.sd.lib.retry
 
 import android.os.Handler
 import android.os.Looper
-import android.os.MessageQueue
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 
@@ -215,16 +214,8 @@ abstract class FRetry(
 
     companion object {
         private val sLock = this@Companion
-
         private val sHolder: MutableMap<Class<out FRetry>, MutableMap<String, WeakRef<FRetry>>> = hashMapOf()
         private val sRefQueue = ReferenceQueue<FRetry>()
-
-        private val sIdleHandler = MainIdleHandler {
-            synchronized(sLock) {
-                releaseRefLocked()
-                sHolder.isNotEmpty()
-            }
-        }
 
         /**
          * 开始
@@ -240,6 +231,7 @@ abstract class FRetry(
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
                 holder[key]?.get() as? T ?: factory().also { instance ->
+                    releaseRefLocked()
                     holder[key] = WeakRef(
                         referent = instance,
                         queue = sRefQueue,
@@ -249,7 +241,6 @@ abstract class FRetry(
                 }
             }.also {
                 it.startRetry()
-                sIdleHandler.register()
             }
         }
 
@@ -288,37 +279,3 @@ private class WeakRef<T>(
     val clazz: Class<out FRetry>,
     val key: String,
 ) : WeakReference<T>(referent, queue)
-
-private class MainIdleHandler(
-    private val block: () -> Boolean,
-) {
-    private var _idleHandler: MessageQueue.IdleHandler? = null
-
-    fun register() {
-        val mainLooper = Looper.getMainLooper() ?: return
-        if (mainLooper === Looper.myLooper()) {
-            addIdleHandler()
-        } else {
-            Handler(mainLooper).post { addIdleHandler() }
-        }
-    }
-
-    private fun addIdleHandler() {
-        val myLooper = Looper.myLooper() ?: return
-        check(myLooper === Looper.getMainLooper())
-
-        _idleHandler?.let { return }
-        MessageQueue.IdleHandler {
-            block().also { keep ->
-                if (keep) {
-                    // keep
-                } else {
-                    _idleHandler = null
-                }
-            }
-        }.also {
-            _idleHandler = it
-            Looper.myQueue().addIdleHandler(it)
-        }
-    }
-}
