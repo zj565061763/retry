@@ -231,13 +231,13 @@ abstract class FRetry(
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
                 holder[key]?.get() as? T ?: factory().also { instance ->
-                    releaseRefLocked()
                     holder[key] = WeakRef(
                         referent = instance,
                         queue = sRefQueue,
                         clazz = clazz,
                         key = key,
                     )
+                    releaseRef()
                 }
             }.also {
                 it.startRetry()
@@ -258,7 +258,7 @@ abstract class FRetry(
             }?.stopRetry()
         }
 
-        private fun releaseRefLocked() {
+        private fun releaseRef() {
             while (true) {
                 val ref = sRefQueue.poll() ?: return
                 check(ref is WeakRef)
