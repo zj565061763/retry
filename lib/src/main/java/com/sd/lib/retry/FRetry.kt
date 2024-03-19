@@ -230,7 +230,7 @@ abstract class FRetry(
                 releaseRef()
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
-                holder[key]?.get() as? T ?: factory().also { instance ->
+                (holder[key]?.get() as? T) ?: factory().also { instance ->
                     holder[key] = WeakRef(
                         referent = instance,
                         queue = sRefQueue,
