@@ -98,28 +98,27 @@ abstract class FRetry(
         }
     }
 
+    @Synchronized
     private fun retryOnUiThread() {
         check(Looper.myLooper() === Looper.getMainLooper())
 
-        val session = synchronized(this@FRetry) {
-            if (state != State.Running) return
-            if (retryCount >= maxRetryCount) return
-            if (_currentSession != null) error("Current session is not finished.")
+        if (state != State.Running) return
+        if (retryCount >= maxRetryCount) return
+        if (_currentSession != null) error("Current session is not finished.")
 
-            val checkRetry = checkRetry()
-            check(state == State.Running) { "Cannot stop retry in checkRetry() callback." }
+        val checkRetry = checkRetry()
+        check(state == State.Running) { "Cannot stop retry in checkRetry() callback." }
 
-            if (!checkRetry) {
-                state = State.Paused
-                _mainHandler.post { onPause() }
-                return
-            }
-
-            retryCount++
-            SessionImpl().also { _currentSession = it }
+        if (!checkRetry) {
+            state = State.Paused
+            _mainHandler.post { onPause() }
+            return
         }
 
-        if (state == State.Running) {
+        retryCount++
+
+        SessionImpl().also { session ->
+            _currentSession = session
             if (onRetry(session)) {
                 // retry
             } else {
