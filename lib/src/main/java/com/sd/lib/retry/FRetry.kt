@@ -104,7 +104,7 @@ abstract class FRetry(
 
         if (state != State.Running) return
         if (retryCount >= maxRetryCount) return
-        if (_currentSession != null) error("Current session is not finished.")
+        check(_currentSession == null) { "Current session is not finished." }
 
         val checkRetry = checkRetry()
         check(state == State.Running) { "Cannot stop retry in checkRetry() callback." }
