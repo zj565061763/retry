@@ -129,7 +129,7 @@ abstract class FRetry(
     }
 
     /**
-     * 检查是否可以发起重试（UI线程），此回调触发时已经synchronized了当前对象，返回false会暂停重试
+     * 检查是否可以发起重试（UI线程），返回false会暂停重试
      * 注意：此回调里不允许调用[stopRetry]方法停止重试
      */
     protected open fun checkRetry(): Boolean = true
@@ -166,7 +166,7 @@ abstract class FRetry(
     /**
      * 重试回调（UI线程），返回false将停止重试
      */
-    abstract fun onRetry(session: Session): Boolean
+    protected abstract fun onRetry(session: Session): Boolean
 
     private inner class SessionImpl : Session {
         var isFinish = false
