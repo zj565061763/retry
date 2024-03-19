@@ -227,6 +227,7 @@ abstract class FRetry(
             factory: () -> T = { clazz.getDeclaredConstructor().newInstance() },
         ): T {
             return synchronized(this@Companion) {
+                releaseRef()
                 val holder = sHolder.getOrPut(clazz) { hashMapOf() }
                 @Suppress("UNCHECKED_CAST")
                 holder[key]?.get() as? T ?: factory().also { instance ->
@@ -236,7 +237,6 @@ abstract class FRetry(
                         clazz = clazz,
                         key = key,
                     )
-                    releaseRef()
                 }
             }.also {
                 it.startRetry()
