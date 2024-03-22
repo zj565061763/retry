@@ -13,11 +13,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
 
-        _binding.btnRetry.setOnClickListener {
+        _binding.btnSampleRetry.setOnClickListener {
             startActivity(Intent(this, SampleRetry::class.java))
         }
 
-        _binding.btnRetryKtx.setOnClickListener {
+        _binding.btnSampleRetryKtx.setOnClickListener {
             startActivity(Intent(this, SampleRetryKtx::class.java))
         }
     }
