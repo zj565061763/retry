@@ -1,11 +1,13 @@
 package com.sd.lib.retry
 
+import com.sd.lib.network.FNetwork
 import com.sd.lib.network.FNetworkObserver
+import com.sd.lib.network.NetworkState
 
 abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
 
     override fun checkRetry(): Boolean {
-        if (!FNetworkObserver.isNetworkAvailable()) {
+        if (!FNetwork.currentNetwork.isConnected()) {
             _networkObserver.register()
             return false
         }
@@ -18,8 +20,8 @@ abstract class FNetRetry(maxRetryCount: Int) : FRetry(maxRetryCount) {
     }
 
     private val _networkObserver = object : FNetworkObserver() {
-        override fun onChange(isAvailable: Boolean) {
-            if (isAvailable) {
+        override fun onChange(networkState: NetworkState) {
+            if (networkState.isConnected()) {
                 resumeRetry()
             }
         }

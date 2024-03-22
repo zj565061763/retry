@@ -1,6 +1,6 @@
 package com.sd.lib.retry
 
-import com.sd.lib.network.fAwaitNetworkAvailable
+import com.sd.lib.network.fNetworkAwait
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -22,7 +22,7 @@ suspend fun <T> fNetRetry(
         maxCount = maxCount,
         interval = interval,
         beforeBlock = {
-            fAwaitNetworkAvailable()
+            fNetworkAwait()
             beforeBlock()
         },
         block = block,
