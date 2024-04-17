@@ -12,7 +12,7 @@ android {
     namespace = "com.sd.lib.retry"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
-        minSdk = 23
+        minSdk = 21
     }
 
     kotlinOptions {
@@ -31,8 +31,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.sd.network)
-    implementation(libs.kotlin.coroutines)
 }
 
 publishing {

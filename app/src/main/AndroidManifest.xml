@@ -25,7 +25,6 @@
         </activity>
 
         <activity android:name=".SampleRetry" />
-        <activity android:name=".SampleRetryKtx" />
 
     </application>
 

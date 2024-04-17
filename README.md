@@ -7,7 +7,6 @@
 * 支持设置重试间隔，最大重试次数
 * 支持自定义重试的条件，例如网络可用才发起重试
 * 支持重试状态监听，例如开始，暂停，结束等
-* 支持协程写法
 
 # Sample
 
@@ -16,7 +15,7 @@
 1. 定义重试类
 
 ```kotlin
-class AppRetry : FNetRetry(
+class AppRetry : FRetry(
     // 设置最大重试次数
     maxRetryCount = 15
 ) {
@@ -65,37 +64,4 @@ FRetry.start(AppRetry::class.java)
 
 // 停止重试
 FRetry.stop(AppRetry::class.java)
-```
-
-#### 协程用法
-
-```kotlin
-private suspend fun retry() {
-    // 发起重试
-    val result = fNetRetry(
-        // 最大重试次数
-        maxCount = 15,
-        // 重试间隔
-        interval = 1_000,
-    ) {
-        if (retryCount >= 10) {
-            // 重试成功
-            Result.success("hello")
-        } else {
-            // 重试失败，继续重试
-            Result.failure(Throwable("failure $retryCount"))
-        }
-    }
-
-    result.onSuccess {
-        // 重试成功
-    }
-
-    result.onFailure { error ->
-        // 重试失败
-        if (error is FRetryExceptionRetryMaxCount) {
-            // 达到最大重试次数
-        }
-    }
-}
 ```
