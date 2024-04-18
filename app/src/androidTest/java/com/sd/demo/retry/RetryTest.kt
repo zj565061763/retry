@@ -14,16 +14,20 @@ class RetryTest {
 
     @Test
     fun testRetryNormal() {
-        val events = mutableListOf<String>()
-        val retry = TestRetry(events = events)
+        val retry = TestRetry()
 
         retry.startRetry()
         assertEquals(FRetry.State.Running, retry.state)
-
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Idle, retry.state)
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
 
-        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+        retry.events.clear()
+        retry.startRetry()
+        retry.startRetry()
+        retry.startRetry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -114,7 +118,7 @@ class RetryTest {
 
 private class TestRetry(
     maxRetryCount: Int = Int.MAX_VALUE,
-    private val events: MutableList<String> = mutableListOf(),
+    val events: MutableList<String> = mutableListOf(),
     private val checkRetry: TestRetry.() -> Boolean = { true },
     private val onStart: TestRetry.() -> Unit = {},
     private val onPause: TestRetry.() -> Unit = {},
