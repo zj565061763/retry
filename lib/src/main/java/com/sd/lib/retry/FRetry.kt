@@ -118,7 +118,9 @@ abstract class FRetry(
         }
 
         val checkRetry = checkRetry()
-        check(state == State.Running) { "Cannot stop retry in checkRetry() callback." }
+        check(state == State.Running) {
+            "Cannot stop retry in checkRetry() callback."
+        }
 
         if (!checkRetry) {
             state = State.Paused
