@@ -172,7 +172,7 @@ class RetryTest {
         )
 
         retry.startRetry()
-        retry.waitForIdle()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|onStop", retry.events.joinToString("|"))
     }
 
@@ -184,7 +184,7 @@ class RetryTest {
         )
 
         retry.startRetry()
-        retry.waitForIdle()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|checkRetry|onPause|onStop", retry.events.joinToString("|"))
     }
 
