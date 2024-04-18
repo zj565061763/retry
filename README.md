@@ -8,7 +8,8 @@
 * 支持自定义重试的条件，例如网络可用才发起重试
 * 支持重试状态监听，例如开始，暂停，结束等
 
-如果你想要使用协程的重试Api，可以查看[retry-ktx](https://github.com/zj565061763/retry-ktx)
+如果你想要使用协程的重试Api，可以查看[retry-ktx](https://github.com/zj565061763/retry-ktx)<br>
+如果你想要网络可用才发起重试，可以配合[network](https://github.com/zj565061763/network)实现，源码中有具体的例子
 
 # Sample
 
