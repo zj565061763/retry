@@ -123,6 +123,7 @@ abstract class FRetry(
         }
 
         if (!checkRetry) {
+            // 暂停重试
             state = State.Paused
             _mainHandler.post { onPause() }
             return
