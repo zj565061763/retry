@@ -33,7 +33,7 @@ abstract class FRetry(
     private var _currentSession: SessionImpl? = null
 
     private val _mainHandler = Handler(Looper.getMainLooper())
-    private val _retryRunnable = Runnable { retryOnUiThread() }
+    private val _retryRunnable = Runnable { retryOnMainThread() }
 
     init {
         require(maxRetryCount > 0) { "Require maxRetryCount > 0" }
@@ -99,7 +99,7 @@ abstract class FRetry(
     }
 
     @Synchronized
-    private fun retryOnUiThread() {
+    private fun retryOnMainThread() {
         check(Looper.myLooper() === Looper.getMainLooper())
 
         if (state != State.Running) return
