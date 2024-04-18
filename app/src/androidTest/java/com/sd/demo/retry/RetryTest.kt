@@ -112,7 +112,9 @@ class RetryTest {
 
         val retry = TestRetry(
             onRetry = {
-                session = it
+                if (session == null) {
+                    session = it
+                }
                 false
             },
         )
@@ -122,6 +124,30 @@ class RetryTest {
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
 
         session!!.retry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+    }
+
+    @Test
+    fun testRetrySessionLifecycleFinish() {
+        var session: FRetry.Session? = null
+
+        val retry = TestRetry(
+            onRetry = {
+                if (session == null) {
+                    session = it
+                }
+                false
+            },
+        )
+
+        retry.startRetry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+
+        retry.events.clear()
+        retry.startRetry()
+        session!!.finish()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
