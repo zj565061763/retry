@@ -198,13 +198,16 @@ class RetryTest {
         )
 
         retry.startRetry()
-        retry.waitForIdle()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
     fun testGlobalRetry() {
         val retry = FRetry.start(TestRetry::class.java)
+        FRetry.start(TestRetry::class.java).also {
+            assertTrue(it === retry)
+        }
         FRetry.start(TestRetry::class.java).also {
             assertTrue(it === retry)
         }
