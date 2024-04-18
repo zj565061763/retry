@@ -85,12 +85,13 @@ class RetryTest {
     }
 
     @Test
-    fun testRetrySessionFinish() {
-
+    fun testRetrySession() {
         val retry = TestRetry(
             maxRetryCount = 2,
             onRetry = {
                 if (retryCount == 1) {
+                    it.retry()
+                    it.retry()
                     it.retry()
                 } else {
                     it.finish()
