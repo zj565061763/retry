@@ -88,7 +88,8 @@ internal class AppRetry : FRetry(15) {
     private val _networkObserver = object : FNetworkObserver() {
         override fun onChange(networkState: NetworkState) {
             if (networkState.isConnected()) {
-                // 网络已连接，恢复重试
+                // 网络已连接，取消注册并恢复重试
+                unregister()
                 resumeRetry()
             }
         }
