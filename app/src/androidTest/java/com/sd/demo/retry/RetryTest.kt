@@ -105,6 +105,26 @@ class RetryTest {
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
+
+    @Test
+    fun testRetrySessionLifecycleRetry() {
+        var session: FRetry.Session? = null
+
+        val retry = TestRetry(
+            onRetry = {
+                session = it
+                false
+            },
+        )
+
+        retry.startRetry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+
+        session!!.retry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+    }
 }
 
 private class TestRetry(
