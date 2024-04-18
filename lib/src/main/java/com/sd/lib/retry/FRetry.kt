@@ -179,7 +179,7 @@ abstract class FRetry(
     protected open fun onRetryMaxCount() = Unit
 
     /**
-     * 重试回调(主线程)，返回false将停止重试
+     * 重试回调(主线程)，返回false停止重试
      */
     protected abstract fun onRetry(session: Session): Boolean
 
