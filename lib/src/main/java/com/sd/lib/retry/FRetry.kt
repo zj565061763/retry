@@ -68,7 +68,7 @@ abstract class FRetry(
         if (state != State.Idle) {
             state = State.Idle
             _mainHandler.removeCallbacks(_retryRunnable)
-            _currentSession?.let { it.isFinish = true }
+            _currentSession?.let { it.finished = true }
             _currentSession = null
             _mainHandler.post { onStop() }
         }
@@ -184,7 +184,7 @@ abstract class FRetry(
     protected abstract fun onRetry(session: Session): Boolean
 
     private inner class SessionImpl : Session {
-        var isFinish = false
+        var finished = false
             set(value) {
                 require(value) { "Require true value." }
                 field = true
@@ -195,8 +195,8 @@ abstract class FRetry(
 
         override fun finish() {
             synchronized(this@FRetry) {
-                if (!isFinish) {
-                    isFinish = true
+                if (!finished) {
+                    finished = true
                     stopRetry()
                 }
             }
@@ -204,8 +204,8 @@ abstract class FRetry(
 
         override fun retry() {
             synchronized(this@FRetry) {
-                if (!isFinish) {
-                    isFinish = true
+                if (!finished) {
+                    finished = true
                     if (state == State.Running) {
                         val interval = calculateInterval(_retryInterval)
                         retryDelayed(interval)
