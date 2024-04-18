@@ -152,6 +152,17 @@ class RetryTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
+
+    @Test
+    fun testCancelAfterStart() {
+        val retry = TestRetry()
+
+        retry.startRetry()
+        retry.stopRetry()
+
+        retry.waitForIdle()
+        assertEquals("onStart|onStop", retry.events.joinToString("|"))
+    }
 }
 
 private class TestRetry(
