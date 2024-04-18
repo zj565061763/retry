@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sd.lib.retry.FRetry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicBoolean
@@ -200,9 +201,21 @@ class RetryTest {
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
+
+    @Test
+    fun testGlobalStartRetry() {
+        val retry = FRetry.start(TestRetry::class.java)
+
+        FRetry.start(TestRetry::class.java).also {
+            assertTrue(it === retry)
+        }
+
+        retry.waitForIdle()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+    }
 }
 
-private class TestRetry(
+class TestRetry(
     maxRetryCount: Int = Int.MAX_VALUE,
     val events: MutableList<String> = mutableListOf(),
     private val checkRetry: TestRetry.() -> Boolean = { true },
