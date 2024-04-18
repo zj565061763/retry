@@ -186,6 +186,20 @@ class RetryTest {
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onPause|onStop", retry.events.joinToString("|"))
     }
+
+    @Test
+    fun testCancelOnRetry() {
+        val retry = TestRetry(
+            onRetry = {
+                stopRetry()
+                true
+            },
+        )
+
+        retry.startRetry()
+        retry.waitForIdle()
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+    }
 }
 
 private class TestRetry(
