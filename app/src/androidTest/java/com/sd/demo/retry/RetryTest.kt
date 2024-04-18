@@ -18,6 +18,7 @@ class RetryTest {
 
         retry.startRetry()
         assertEquals(FRetry.State.Running, retry.state)
+
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Idle, retry.state)
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
