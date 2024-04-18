@@ -53,6 +53,23 @@ class RetryTest {
     }
 
     @Test
+    fun testRetryReturnFalse() {
+        val events = mutableListOf<String>()
+
+        val retry = TestRetry(
+            events = events,
+            onRetry = {
+                it.retry()
+                false
+            },
+        )
+
+        retry.startRetry()
+        retry.waitForIdle()
+        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+    }
+
+    @Test
     fun testRetryCount() {
         val events = mutableListOf<String>()
 
@@ -72,68 +89,74 @@ class RetryTest {
     }
 
     @Test
-    fun testRetryReturnFalse() {
+    fun testRetrySessionFinish() {
         val events = mutableListOf<String>()
 
         val retry = TestRetry(
+            maxRetryCount = 2,
             events = events,
             onRetry = {
-                it.retry()
-                false
+                if (retryCount == 1) {
+                    it.retry()
+                } else {
+                    it.finish()
+                }
+                true
             },
         )
 
+        retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop", events.joinToString("|"))
     }
 }
 
 private class TestRetry(
     maxRetryCount: Int = Int.MAX_VALUE,
     private val events: MutableList<String> = mutableListOf(),
-    private val checkRetry: () -> Boolean = { true },
-    private val onStart: () -> Unit = {},
-    private val onPause: () -> Unit = {},
-    private val onStop: () -> Unit = {},
-    private val onRetryMaxCount: () -> Unit = {},
-    private val onRetry: (Session) -> Boolean = { false },
+    private val checkRetry: TestRetry.() -> Boolean = { true },
+    private val onStart: TestRetry.() -> Unit = {},
+    private val onPause: TestRetry.() -> Unit = {},
+    private val onStop: TestRetry.() -> Unit = {},
+    private val onRetryMaxCount: TestRetry.() -> Unit = {},
+    private val onRetry: TestRetry.(Session) -> Boolean = { false },
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
     override fun checkRetry(): Boolean {
         checkMainLooper()
         events.add("checkRetry")
-        return checkRetry.invoke()
+        return checkRetry.invoke(this)
     }
 
     override fun onStart() {
         checkMainLooper()
         events.add("onStart")
-        onStart.invoke()
+        onStart.invoke(this)
     }
 
     override fun onPause() {
         checkMainLooper()
         events.add("onPause")
-        onPause.invoke()
+        onPause.invoke(this)
     }
 
     override fun onStop() {
         checkMainLooper()
         events.add("onStop")
-        onStop.invoke()
+        onStop.invoke(this)
     }
 
     override fun onRetry(session: Session): Boolean {
         checkMainLooper()
         events.add("onRetry")
-        return onRetry.invoke(session)
+        return onRetry.invoke(this, session)
     }
 
     override fun onRetryMaxCount() {
         checkMainLooper()
         events.add("onRetryMaxCount")
-        onRetryMaxCount.invoke()
+        onRetryMaxCount.invoke(this)
     }
 
     fun tryResumeRetry() {
