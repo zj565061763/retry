@@ -144,7 +144,7 @@ abstract class FRetry(
     }
 
     /**
-     * 检查是否可以发起重试（UI线程），返回false会暂停重试
+     * 检查是否可以发起重试(主线程)，返回false会暂停重试
      * 注意：此回调里不允许调用[stopRetry]方法停止重试
      */
     protected open fun checkRetry(): Boolean = true
@@ -155,31 +155,31 @@ abstract class FRetry(
     protected open fun calculateInterval(interval: Long): Long = interval
 
     /**
-     * 开始回调（UI线程）
+     * 开始回调(主线程)
      * 注意：在此回调里查询[state]并不一定是[State.Running]，此回调仅用来做事件通知
      */
     protected open fun onStart() = Unit
 
     /**
-     * 暂停回调（UI线程）
+     * 暂停回调(主线程)
      * 注意：在此回调里查询[state]并不一定是[State.Paused]，此回调仅用来做事件通知
      */
     protected open fun onPause() = Unit
 
     /**
-     * 结束回调（UI线程）
+     * 结束回调(主线程)
      * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做事件通知
      */
     protected open fun onStop() = Unit
 
     /**
-     * 达到最大重试次数回调（UI线程）
+     * 达到最大重试次数回调(主线程)
      * 注意：在此回调里查询[state]并不一定是[State.Idle]，此回调仅用来做事件通知
      */
     protected open fun onRetryMaxCount() = Unit
 
     /**
-     * 重试回调（UI线程），返回false将停止重试
+     * 重试回调(主线程)，返回false将停止重试
      */
     protected abstract fun onRetry(session: Session): Boolean
 

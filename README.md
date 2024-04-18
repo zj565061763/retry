@@ -26,19 +26,19 @@ class AppRetry : FRetry(
     }
 
     override fun onStart() {
-        // 开始回调（UI线程）
+        // 开始回调(主线程)
     }
 
     override fun onPause() {
-        // 暂停回调（UI线程）
+        // 暂停回调(主线程)
     }
 
     override fun onStop() {
-        // 结束回调（UI线程）
+        // 结束回调(主线程)
     }
 
     override fun onRetry(session: Session): Boolean {
-        // 重试回调（UI线程）
+        // 重试回调(主线程)
 
         // 继续重试
         session.retry()
@@ -51,7 +51,7 @@ class AppRetry : FRetry(
     }
 
     override fun onRetryMaxCount() {
-        // 达到最大重试次数回调（UI线程）
+        // 达到最大重试次数回调(主线程)
     }
 }
 ```
