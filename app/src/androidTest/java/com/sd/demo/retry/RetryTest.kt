@@ -68,6 +68,7 @@ class RetryTest {
             },
         )
 
+        retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", events.joinToString("|"))
