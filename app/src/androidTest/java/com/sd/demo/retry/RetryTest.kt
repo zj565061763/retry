@@ -13,20 +13,48 @@ import java.util.concurrent.atomic.AtomicBoolean
 class RetryTest {
 
     @Test
-    fun testCallback() {
+    fun testRetryNormal() {
+        kotlin.run {
+            val events = mutableListOf<String>()
+            val retry = TestRetry(events = events)
+
+            retry.startRetry()
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+        }
+
+        kotlin.run {
+            val events = mutableListOf<String>()
+            val retry = TestRetry(events = events)
+
+            retry.startRetry()
+            retry.startRetry()
+            retry.startRetry()
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+        }
+    }
+
+    @Test
+    fun testRetryPauseResume() {
         val events = mutableListOf<String>()
-        val retry = TestRetry(events = events)
+
+        val checkRetryFlag = AtomicBoolean(false)
+
+        val retry = TestRetry(
+            events = events,
+            checkRetry = { checkRetryFlag.get() }
+        )
 
         kotlin.run {
             retry.startRetry()
             InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
 
-            retry.startRetry()
-            retry.startRetry()
-            retry.startRetry()
+            checkRetryFlag.set(true)
+            retry.tryResumeRetry()
             InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+
+            assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", events.joinToString("|"))
         }
     }
 
