@@ -203,15 +203,19 @@ class RetryTest {
     }
 
     @Test
-    fun testGlobalStartRetry() {
+    fun testGlobalRetry() {
         val retry = FRetry.start(TestRetry::class.java)
-
         FRetry.start(TestRetry::class.java).also {
             assertTrue(it === retry)
         }
-
-        retry.waitForIdle()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+
+        retry.events.clear()
+        FRetry.start(TestRetry::class.java)
+        FRetry.stop(TestRetry::class.java)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals("onStart|onStop", retry.events.joinToString("|"))
     }
 }
 
