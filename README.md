@@ -2,11 +2,13 @@
 
 # About
 
-提供健壮的重试逻辑，如果你想要使用协程的重试Api，可以查看[retry-ktx](https://github.com/zj565061763/retry-ktx)
+封装重试功能，提供健壮的重试逻辑。
 
 * 支持设置重试间隔，最大重试次数
 * 支持自定义重试的条件，例如网络可用才发起重试
 * 支持重试状态监听，例如开始，暂停，结束等
+
+如果你想要使用协程的重试Api，可以查看[retry-ktx](https://github.com/zj565061763/retry-ktx)
 
 # Sample
 
