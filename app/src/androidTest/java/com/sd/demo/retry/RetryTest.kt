@@ -70,6 +70,23 @@ class RetryTest {
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", events.joinToString("|"))
     }
+
+    @Test
+    fun testRetryReturnFalse() {
+        val events = mutableListOf<String>()
+
+        val retry = TestRetry(
+            events = events,
+            onRetry = {
+                it.retry()
+                false
+            },
+        )
+
+        retry.startRetry()
+        retry.waitForIdle()
+        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+    }
 }
 
 private class TestRetry(
