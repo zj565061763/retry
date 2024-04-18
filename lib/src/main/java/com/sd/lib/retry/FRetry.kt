@@ -121,13 +121,15 @@ abstract class FRetry(
 
         retryCount++
 
-        SessionImpl().also { session ->
-            _currentSession = session
-            if (onRetry(session)) {
-                // retry
-            } else {
-                stopRetry()
-            }
+        val session = SessionImpl().also {
+            // 保存Session
+            _currentSession = it
+        }
+
+        if (onRetry(session)) {
+            // retry
+        } else {
+            stopRetry()
         }
     }
 
