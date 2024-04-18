@@ -13,10 +13,6 @@
 
 # Sample
 
-#### 普通用法
-
-1. 定义重试类
-
 ```kotlin
 class AppRetry : FRetry(
     // 设置最大重试次数
@@ -58,8 +54,6 @@ class AppRetry : FRetry(
     }
 }
 ```
-
-2. 开始和停止重试
 
 ```kotlin
 // 开始重试
