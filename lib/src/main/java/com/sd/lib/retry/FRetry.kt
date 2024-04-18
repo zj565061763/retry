@@ -102,7 +102,11 @@ abstract class FRetry(
     private fun retryOnMainThread() {
         check(Looper.myLooper() === Looper.getMainLooper())
 
-        if (state != State.Running) return
+        if (state != State.Running) {
+            // 重试已经被取消
+            return
+        }
+
         if (retryCount >= maxRetryCount) return
         check(_currentSession == null) { "Current session is not finished." }
 
