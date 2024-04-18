@@ -38,7 +38,6 @@ class RetryTest {
     @Test
     fun testRetryPauseResume() {
         val events = mutableListOf<String>()
-
         val checkRetryFlag = AtomicBoolean(false)
 
         val retry = TestRetry(
