@@ -32,11 +32,9 @@ class RetryTest {
 
     @Test
     fun testRetryPauseResume() {
-        val events = mutableListOf<String>()
         val checkRetryFlag = AtomicBoolean(false)
 
         val retry = TestRetry(
-            events = events,
             checkRetry = { checkRetryFlag.get() }
         )
 
@@ -53,15 +51,12 @@ class RetryTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Idle, retry.state)
 
-        assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", events.joinToString("|"))
+        assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
     fun testRetryReturnFalse() {
-        val events = mutableListOf<String>()
-
         val retry = TestRetry(
-            events = events,
             onRetry = {
                 it.retry()
                 false
@@ -70,16 +65,13 @@ class RetryTest {
 
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
+        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
     fun testRetryCount() {
-        val events = mutableListOf<String>()
-
         val retry = TestRetry(
             maxRetryCount = 2,
-            events = events,
             onRetry = {
                 it.retry()
                 true
@@ -89,16 +81,14 @@ class RetryTest {
         retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", events.joinToString("|"))
+        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", retry.events.joinToString("|"))
     }
 
     @Test
     fun testRetrySessionFinish() {
-        val events = mutableListOf<String>()
 
         val retry = TestRetry(
             maxRetryCount = 2,
-            events = events,
             onRetry = {
                 if (retryCount == 1) {
                     it.retry()
@@ -112,7 +102,7 @@ class RetryTest {
         retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop", events.joinToString("|"))
+        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 }
 
