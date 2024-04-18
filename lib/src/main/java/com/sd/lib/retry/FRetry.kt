@@ -150,7 +150,7 @@ abstract class FRetry(
     protected open fun checkRetry(): Boolean = true
 
     /**
-     * 计算重试间隔
+     * 计算重试间隔，在[Session.retry]调用的线程触发
      */
     protected open fun calculateInterval(interval: Long): Long = interval
 
