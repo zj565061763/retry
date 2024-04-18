@@ -268,6 +268,7 @@ abstract class FRetry(
             key: String = "",
         ) {
             synchronized(this@Companion) {
+                // 这里不能移除重试对象，因为外部可能直接持有重试对象
                 sHolder[clazz]?.get(key)?.get()
             }?.stopRetry()
         }
