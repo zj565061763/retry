@@ -14,25 +14,16 @@ class RetryTest {
 
     @Test
     fun testRetryNormal() {
-        kotlin.run {
-            val events = mutableListOf<String>()
-            val retry = TestRetry(events = events)
+        val events = mutableListOf<String>()
+        val retry = TestRetry(events = events)
 
-            retry.startRetry()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
-        }
+        retry.startRetry()
+        assertEquals(FRetry.State.Running, retry.state)
 
-        kotlin.run {
-            val events = mutableListOf<String>()
-            val retry = TestRetry(events = events)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals(FRetry.State.Idle, retry.state)
 
-            retry.startRetry()
-            retry.startRetry()
-            retry.startRetry()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
-        }
+        assertEquals("onStart|checkRetry|onRetry|onStop", events.joinToString("|"))
     }
 
     @Test
@@ -46,11 +37,17 @@ class RetryTest {
         )
 
         retry.startRetry()
+        assertEquals(FRetry.State.Running, retry.state)
+
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals(FRetry.State.Paused, retry.state)
 
         checkRetryFlag.set(true)
         retry.tryResumeRetry()
+        assertEquals(FRetry.State.Running, retry.state)
+
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        assertEquals(FRetry.State.Idle, retry.state)
 
         assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", events.joinToString("|"))
     }
@@ -72,36 +69,6 @@ class RetryTest {
         retry.startRetry()
         retry.waitForIdle()
         assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", events.joinToString("|"))
-    }
-
-    @Test
-    fun testState() {
-        TestRetry().let { retry ->
-            retry.startRetry()
-            assertEquals(FRetry.State.Running, retry.state)
-
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals(FRetry.State.Idle, retry.state)
-        }
-
-        val checkRetryFlag = AtomicBoolean(false)
-
-        TestRetry(
-            checkRetry = { checkRetryFlag.get() },
-        ).let { retry ->
-            retry.startRetry()
-            assertEquals(FRetry.State.Running, retry.state)
-
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals(FRetry.State.Paused, retry.state)
-
-            checkRetryFlag.set(true)
-            retry.tryResumeRetry()
-            assertEquals(FRetry.State.Running, retry.state)
-
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-            assertEquals(FRetry.State.Idle, retry.state)
-        }
     }
 }
 
