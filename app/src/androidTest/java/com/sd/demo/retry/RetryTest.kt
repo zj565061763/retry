@@ -45,16 +45,32 @@ class RetryTest {
             checkRetry = { checkRetryFlag.get() }
         )
 
-        kotlin.run {
-            retry.startRetry()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        retry.startRetry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
-            checkRetryFlag.set(true)
-            retry.tryResumeRetry()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        checkRetryFlag.set(true)
+        retry.tryResumeRetry()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
-            assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", events.joinToString("|"))
-        }
+        assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", events.joinToString("|"))
+    }
+
+    @Test
+    fun testRetryCount() {
+        val events = mutableListOf<String>()
+
+        val retry = TestRetry(
+            maxRetryCount = 2,
+            events = events,
+            onRetry = {
+                it.retry()
+                true
+            },
+        )
+
+        retry.startRetry()
+        retry.waitForIdle()
+        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", events.joinToString("|"))
     }
 
     @Test
@@ -137,6 +153,18 @@ private class TestRetry(
 
     fun tryResumeRetry() {
         super.resumeRetry()
+    }
+
+    fun waitForIdle() {
+        while (true) {
+            if (state == State.Idle) {
+                break
+            } else {
+                Thread.sleep(10)
+                continue
+            }
+        }
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     }
 }
 
