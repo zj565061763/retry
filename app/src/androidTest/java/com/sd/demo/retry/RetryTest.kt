@@ -15,9 +15,7 @@ class RetryTest {
     @Test
     fun testCallback() {
         val events = mutableListOf<String>()
-        val retry = TestRetry(events = events) {
-            false
-        }
+        val retry = TestRetry(events = events)
 
         kotlin.run {
             retry.startRetry()
@@ -28,7 +26,7 @@ class RetryTest {
 
     @Test
     fun testState() {
-        TestRetry { false }.let { retry ->
+        TestRetry().let { retry ->
             retry.startRetry()
             assertEquals(FRetry.State.Running, retry.state)
 
@@ -40,7 +38,7 @@ class RetryTest {
 
         TestRetry(
             checkRetry = { checkRetryFlag.get() },
-        ) { false }.let { retry ->
+        ).let { retry ->
             retry.startRetry()
             assertEquals(FRetry.State.Running, retry.state)
 
@@ -65,7 +63,7 @@ private class TestRetry(
     private val onPause: () -> Unit = {},
     private val onStop: () -> Unit = {},
     private val onRetryMaxCount: () -> Unit = {},
-    private val onRetry: (Session) -> Boolean,
+    private val onRetry: (Session) -> Boolean = { false },
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
     override fun checkRetry(): Boolean {
