@@ -152,7 +152,7 @@ abstract class FRetry(
     /**
      * 计算重试间隔，在[Session.retry]调用的线程触发
      */
-    protected open fun calculateInterval(interval: Long): Long = interval
+    protected open fun calculateRetryInterval(interval: Long): Long = interval
 
     /**
      * 开始回调(主线程)
@@ -207,7 +207,7 @@ abstract class FRetry(
                 if (!finished) {
                     finished = true
                     if (state == State.Running) {
-                        val interval = calculateInterval(_retryInterval)
+                        val interval = calculateRetryInterval(_retryInterval)
                         retryDelayed(interval)
                     }
                 }
