@@ -1,9 +1,41 @@
 package com.sd.lib.retry
 
+import com.sd.lib.network.fNetworkAwait
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+
+/**
+ * 网络已连接才会执行，具体逻辑参考[fRetry]
+ */
+suspend fun <T> fNetRetry(
+    /** 最大执行次数 */
+    maxCount: Int = Int.MAX_VALUE,
+
+    /** 执行间隔(毫秒) */
+    interval: Long = 5_000,
+
+    /** 失败回调 */
+    onFailure: FRetryScope.(Throwable) -> Unit = {},
+
+    /** 在[block]回调之前执行 */
+    beforeBlock: suspend FRetryScope.() -> Unit = {},
+
+    /** 执行回调 */
+    block: suspend FRetryScope.() -> T,
+): Result<T> {
+    return fRetry(
+        maxCount = maxCount,
+        interval = interval,
+        onFailure = onFailure,
+        beforeBlock = {
+            fNetworkAwait()
+            beforeBlock()
+        },
+        block = block,
+    )
+}
 
 /**
  * 执行[block]，[block]发生的异常会被捕获([CancellationException]异常除外)并通知[onFailure]，[onFailure]的异常不会被捕获，
