@@ -12,7 +12,7 @@ abstract class FNetRetry(
     maxRetryCount: Int,
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
-    override fun checkRetry(): Boolean {
+    override fun canRetry(): Boolean {
         return isNetConnected(FNetwork.currentNetwork)
             .also { isConnected ->
                 if (!isConnected) {

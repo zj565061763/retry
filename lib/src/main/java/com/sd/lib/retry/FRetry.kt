@@ -117,12 +117,12 @@ abstract class FRetry(
             error("Current session is not finished.")
         }
 
-        val checkRetry = checkRetry()
+        val canRetry = canRetry()
         check(state == State.Running) {
-            "Cannot stop retry in checkRetry() callback."
+            "Cannot stop retry in canRetry() callback."
         }
 
-        if (!checkRetry) {
+        if (!canRetry) {
             // 暂停重试
             state = State.Paused
             _mainHandler.post { onPause() }
@@ -144,10 +144,10 @@ abstract class FRetry(
     }
 
     /**
-     * 检查是否可以发起重试(主线程)，返回false会暂停重试
+     * 是否可以发起重试(主线程)，返回false会暂停重试
      * 注意：此回调里不允许调用[stopRetry]方法停止重试
      */
-    protected open fun checkRetry(): Boolean = true
+    protected open fun canRetry(): Boolean = true
 
     /**
      * 计算重试间隔，在[Session.retry]调用的线程触发

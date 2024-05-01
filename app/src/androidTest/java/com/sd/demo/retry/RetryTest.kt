@@ -233,7 +233,7 @@ class TestRetry(
     private val onRetry: TestRetry.(Session) -> Boolean = { false },
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
-    override fun checkRetry(): Boolean {
+    override fun canRetry(): Boolean {
         checkMainLooper()
         events.add("checkRetry")
         return checkRetry.invoke(this)
