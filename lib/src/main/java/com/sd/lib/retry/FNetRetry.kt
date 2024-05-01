@@ -15,8 +15,11 @@ abstract class FNetRetry(
     private var _networkObserver: FNetworkObserver? = null
 
     override fun canRetry(): Boolean {
-        return isNetConnected(FNetwork.currentNetwork)
-            .also { if (!it) registerObserver() }
+        if (!isNetConnected(FNetwork.currentNetwork)) {
+            registerObserver()
+            return false
+        }
+        return super.canRetry()
     }
 
     /**
