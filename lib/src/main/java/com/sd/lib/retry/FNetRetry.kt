@@ -5,7 +5,7 @@ import com.sd.lib.network.FNetworkObserver
 import com.sd.lib.network.NetworkState
 
 /**
- * 网络已连接才会发起重试
+ * [isNetConnected]返回true，才会发起重试
  */
 abstract class FNetRetry(
     /** 最大重试次数 */
