@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
                 Content(
                     listActivity = listOf(
                         SampleRetry::class.java,
+                        SampleRetryKtx::class.java,
                     ),
                     onClickActivity = {
                         startActivity(Intent(this, it))
@@ -53,7 +54,7 @@ private fun Content(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(
-            listActivity,
+            items = listActivity,
             key = { it },
         ) { item ->
             Button(
