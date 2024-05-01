@@ -13,11 +13,12 @@ abstract class FNetRetry(
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
     override fun checkRetry(): Boolean {
-        if (!isNetConnected(FNetwork.currentNetwork)) {
-            _networkObserver.register()
-            return false
-        }
-        return super.checkRetry()
+        return isNetConnected(FNetwork.currentNetwork)
+            .also { isConnected ->
+                if (!isConnected) {
+                    _networkObserver.register()
+                }
+            }
     }
 
     /**
