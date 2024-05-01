@@ -22,22 +22,22 @@ class RetryTest {
 
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Idle, retry.state)
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
 
         retry.events.clear()
         retry.startRetry()
         retry.startRetry()
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
     fun testRetryPauseResume() {
-        val checkRetryFlag = AtomicBoolean(false)
+        val canRetryFlag = AtomicBoolean(false)
 
         val retry = TestRetry(
-            checkRetry = { checkRetryFlag.get() }
+            canRetry = { canRetryFlag.get() }
         )
 
         retry.startRetry()
@@ -46,14 +46,14 @@ class RetryTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Paused, retry.state)
 
-        checkRetryFlag.set(true)
+        canRetryFlag.set(true)
         retry.tryResumeRetry()
         assertEquals(FRetry.State.Running, retry.state)
 
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         assertEquals(FRetry.State.Idle, retry.state)
 
-        assertEquals("onStart|checkRetry|onPause|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onPause|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -67,7 +67,7 @@ class RetryTest {
 
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -83,7 +83,7 @@ class RetryTest {
         retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop|onRetryMaxCount", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|canRetry|onRetry|onStop|onRetryMaxCount", retry.events.joinToString("|"))
     }
 
     @Test
@@ -105,7 +105,7 @@ class RetryTest {
         retry.setRetryInterval(100)
         retry.startRetry()
         retry.waitForIdle()
-        assertEquals("onStart|checkRetry|onRetry|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -123,11 +123,11 @@ class RetryTest {
 
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
 
         session!!.retry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -145,13 +145,13 @@ class RetryTest {
 
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
 
         retry.events.clear()
         retry.startRetry()
         session!!.finish()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -179,13 +179,13 @@ class RetryTest {
     @Test
     fun testCancelOnPause() {
         val retry = TestRetry(
-            checkRetry = { false },
+            canRetry = { false },
             onPause = { stopRetry() },
         )
 
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onPause|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onPause|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -199,7 +199,7 @@ class RetryTest {
 
         retry.startRetry()
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
     }
 
     @Test
@@ -212,7 +212,7 @@ class RetryTest {
             assertTrue(it === retry)
         }
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        assertEquals("onStart|checkRetry|onRetry|onStop", retry.events.joinToString("|"))
+        assertEquals("onStart|canRetry|onRetry|onStop", retry.events.joinToString("|"))
 
         retry.events.clear()
         FRetry.start(TestRetry::class.java)
@@ -225,7 +225,7 @@ class RetryTest {
 class TestRetry(
     maxRetryCount: Int = Int.MAX_VALUE,
     val events: MutableList<String> = mutableListOf(),
-    private val checkRetry: TestRetry.() -> Boolean = { true },
+    private val canRetry: TestRetry.() -> Boolean = { true },
     private val onStart: TestRetry.() -> Unit = {},
     private val onPause: TestRetry.() -> Unit = {},
     private val onStop: TestRetry.() -> Unit = {},
@@ -235,8 +235,8 @@ class TestRetry(
 
     override fun canRetry(): Boolean {
         checkMainLooper()
-        events.add("checkRetry")
-        return checkRetry.invoke(this)
+        events.add("canRetry")
+        return canRetry.invoke(this)
     }
 
     override fun onStart() {
