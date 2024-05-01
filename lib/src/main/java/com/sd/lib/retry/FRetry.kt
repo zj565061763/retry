@@ -5,7 +5,7 @@ import android.os.Looper
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 
-abstract class FRetry(
+abstract class FRetry @JvmOverloads constructor(
     /** 最大重试次数 */
     private val maxRetryCount: Int = Int.MAX_VALUE,
 ) {

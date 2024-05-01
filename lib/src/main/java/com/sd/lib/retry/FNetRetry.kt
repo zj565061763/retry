@@ -7,7 +7,7 @@ import com.sd.lib.network.NetworkState
 /**
  * [isNetConnected]返回true，才会发起重试
  */
-abstract class FNetRetry(
+abstract class FNetRetry @JvmOverloads constructor(
     /** 最大重试次数 */
     maxRetryCount: Int = Int.MAX_VALUE,
 ) : FRetry(maxRetryCount = maxRetryCount) {
