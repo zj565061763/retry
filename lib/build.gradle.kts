@@ -6,7 +6,7 @@ plugins {
 
 val libGroupId = "com.sd.lib.android"
 val libArtifactId = "retry"
-val libVersion = "1.8.0"
+val libVersion = "1.9.0-beta01"
 
 android {
     namespace = "com.sd.lib.retry"
