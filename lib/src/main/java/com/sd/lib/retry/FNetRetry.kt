@@ -12,25 +12,11 @@ abstract class FNetRetry(
     maxRetryCount: Int,
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
+    private var _networkObserver: FNetworkObserver? = null
+
     override fun canRetry(): Boolean {
         return isNetConnected(FNetwork.currentNetwork)
-            .also { isConnected ->
-                if (!isConnected) {
-                    _networkObserver.register()
-                }
-            }
-    }
-
-    /**
-     * 网络监听
-     */
-    private val _networkObserver = object : FNetworkObserver() {
-        override fun onChange(networkState: NetworkState) {
-            if (isNetConnected(networkState)) {
-                unregister()
-                resumeRetry()
-            }
-        }
+            .also { if (!it) registerObserver() }
     }
 
     /**
@@ -42,7 +28,25 @@ abstract class FNetRetry(
 
     override fun onStop() {
         super.onStop()
-        // 取消网络监听
-        _networkObserver.unregister()
+        unregisterObserver()
+    }
+
+    private fun registerObserver() {
+        if (_networkObserver == null) {
+            _networkObserver = object : FNetworkObserver() {
+                override fun onChange(networkState: NetworkState) {
+                    if (isNetConnected(networkState)) {
+                        unregister()
+                        resumeRetry()
+                    }
+                }
+            }
+        }
+        _networkObserver!!.register()
+    }
+
+    private fun unregisterObserver() {
+        _networkObserver?.unregister()
+        _networkObserver = null
     }
 }
