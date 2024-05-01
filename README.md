@@ -1,6 +1,6 @@
 [![](https://jitpack.io/v/zj565061763/retry.svg)](https://jitpack.io/#zj565061763/retry)
 
-# About
+# 关于
 
 封装重试功能，提供健壮的重试逻辑。
 
@@ -10,7 +10,7 @@
 
 网络相关的功能用到了[network](https://github.com/zj565061763/network)
 
-# Sample
+# 普通重试
 
 ```kotlin
 /**
@@ -63,4 +63,67 @@ FRetry.start(AppRetry::class.java)
 
 // 停止重试
 FRetry.stop(AppRetry::class.java)
+```
+
+# 协程重试
+
+```kotlin
+/**
+ * 网络已连接才会执行，具体逻辑参考[fRetry]
+ */
+suspend fun <T> fNetRetry(
+    /** 最大执行次数 */
+    maxCount: Int = Int.MAX_VALUE,
+
+    /** 执行间隔(毫秒) */
+    interval: Long = 5_000,
+
+    /** 失败回调 */
+    onFailure: FRetryScope.(Throwable) -> Unit = {},
+
+    /** 在[block]回调之前执行 */
+    beforeBlock: suspend FRetryScope.() -> Unit = {},
+
+    /** 执行回调 */
+    block: suspend FRetryScope.() -> T,
+): Result<T>
+```
+
+```kotlin
+/**
+ * 执行[block]，[block]发生的异常会被捕获([CancellationException]异常除外)并通知[onFailure]，[onFailure]的异常不会被捕获，
+ * [block]发生异常之后，如果未达到最大执行次数[maxCount]，延迟[interval]之后继续执行[block]；
+ * 如果达到最大执行次数[maxCount]，则返回的[Result]异常为[FRetryExceptionMaxCount]并携带最后一次的异常，
+ * [beforeBlock]在[block]回调之前执行，[beforeBlock]发生的异常不会被捕获
+ */
+suspend fun <T> fRetry(
+    /** 最大执行次数 */
+    maxCount: Int = Int.MAX_VALUE,
+
+    /** 执行间隔(毫秒) */
+    interval: Long = 5_000,
+
+    /** 失败回调 */
+    onFailure: FRetryScope.(Throwable) -> Unit = {},
+
+    /** 在[block]回调之前执行 */
+    beforeBlock: suspend FRetryScope.() -> Unit = {},
+
+    /** 执行回调 */
+    block: suspend FRetryScope.() -> T,
+): Result<T>
+```
+
+```kotlin
+interface FRetryScope {
+    /** 当前执行次数 */
+    val currentCount: Int
+}
+```
+
+```kotlin
+/**
+ * 达到最大执行次数
+ */
+class FRetryExceptionMaxCount(cause: Throwable) : Exception(cause)
 ```
