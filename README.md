@@ -13,7 +13,10 @@
 # Sample
 
 ```kotlin
-class AppRetry : FRetry(
+/**
+ * 网络已连接才发起重试
+ */
+class AppRetry : FNetRetry(
     // 设置最大重试次数
     maxRetryCount = 15
 ) {
