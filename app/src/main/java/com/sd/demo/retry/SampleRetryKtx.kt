@@ -46,7 +46,6 @@ class SampleRetryKtx : ComponentActivity() {
         fNetRetry(
             maxCount = 15,
             interval = 1_000,
-            onFailure = { logMsg { "onFailure:$it" } },
         ) {
             logMsg { "retry $currentCount" }
             if (currentCount >= 10) {
