@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
 
 abstract class FRetry @JvmOverloads constructor(
     /** 最大重试次数 */
-    private val maxRetryCount: Int = Int.MAX_VALUE,
+    private val maxRetryCount: Int = 5,
 ) {
     enum class State {
         /** 空闲 */

@@ -73,7 +73,7 @@ FRetry.stop(AppRetry::class.java)
  */
 suspend fun <T> fNetRetry(
     /** 最大执行次数 */
-    maxCount: Int = Int.MAX_VALUE,
+    maxCount: Int = 5,
 
     /** 执行间隔(毫秒) */
     interval: Long = 5_000,
@@ -98,7 +98,7 @@ suspend fun <T> fNetRetry(
  */
 suspend fun <T> fRetry(
     /** 最大执行次数 */
-    maxCount: Int = Int.MAX_VALUE,
+    maxCount: Int = 5,
 
     /** 执行间隔(毫秒) */
     interval: Long = 5_000,

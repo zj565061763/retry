@@ -9,7 +9,7 @@ import com.sd.lib.network.NetworkState
  */
 abstract class FNetRetry @JvmOverloads constructor(
     /** 最大重试次数 */
-    maxRetryCount: Int = Int.MAX_VALUE,
+    maxRetryCount: Int = 5,
 ) : FRetry(maxRetryCount = maxRetryCount) {
 
     private var _networkObserver: FNetworkObserver? = null
