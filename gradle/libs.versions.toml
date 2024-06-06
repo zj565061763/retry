@@ -2,11 +2,11 @@
 
 androidCompileSdk = "34"
 
-androidGradlePlugin = "8.4.0"
-kotlin = "1.9.23"
+androidGradlePlugin = "8.4.1"
+kotlin = "1.9.24"
 
-compose = "1.6.6"
-composeCompiler = "1.5.12"
+compose = "1.6.7"
+composeCompiler = "1.5.14"
 composeMaterial3 = "1.2.1"
 
 lifecycle = "2.7.0"
